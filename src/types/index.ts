@@ -8,6 +8,8 @@ export interface User {
     watchHistory?: string[];
     createdAt: string;
     updatedAt: string;
+    accessToken?: string;
+    refreshToken?: string;
   }
   
   export interface Video {
@@ -24,6 +26,7 @@ export interface User {
     updatedAt: string;
     isLiked?: boolean;
     likesCount?: number;
+    commentsCount?: number;
   }
   
   export interface Comment {
