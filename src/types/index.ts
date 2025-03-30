@@ -32,8 +32,14 @@ export interface User {
   export interface Comment {
     _id: string;
     content: string;
-    video: string;
-    owner: User | string;
+    video: string | {
+        _id: string;
+      };
+    owner: string | {
+        _id: string;
+        avatar?: string;
+        username?: string;
+      };
     createdAt: string;
     updatedAt: string;
     isLiked?: boolean;
