@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@/services/api';
 import { queryKeys } from '@/lib/queryKeys';
-import { Video } from '@/types';
+// import { Video } from '@/types';
 
 // Get videos with optional filtering
 export function useVideos(params = {}) {
