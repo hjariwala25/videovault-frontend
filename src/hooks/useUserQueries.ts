@@ -61,13 +61,20 @@ export function useLogin() {
 
 // Register user
 export function useRegister() {
-  return useMutation({
-    mutationFn: async (formData: FormData) => {
-      const response = await api.post("/users/register", formData);
-      return response.data.data;
-    },
-  });
-}
+    return useMutation({
+      mutationFn: async (formData: FormData) => {
+        // if (process.env.NODE_ENV !== 'production') {
+        //   console.log('FormData entries:');
+        //   for (const pair of formData.entries()) {
+        //     console.log(pair[0], pair[1]);
+        //   }
+        // }
+        
+        const response = await api.post('/users/register', formData);
+        return response.data.data;
+      },
+    });
+  }
 
 // Logout user
 export function useLogout() {

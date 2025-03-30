@@ -3,13 +3,19 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1',
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 api.interceptors.request.use(
   (config) => {
+    // Let axios set content-type automatically for FormData
+    if (config.data instanceof FormData) {
+      // Remove content-type to let browser set it with correct boundary
+      delete config.headers['Content-Type'];
+    } else {
+      // Set JSON content type for non-FormData requests
+      config.headers['Content-Type'] = 'application/json';
+    }
+    
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
