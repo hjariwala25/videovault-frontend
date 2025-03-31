@@ -114,7 +114,8 @@ export default function Header() {
                         alt={user.username}
                         width={40}
                         height={40}
-                        className="rounded-full object-cover border-2 border-gray-200"
+                        className="rounded-full object-cover border-2 border-blue-100 hover:border-blue-300 shadow-sm transition-all duration-200 aspect-square flex-shrink-0"
+                        priority
                       />
                     </button>
                   </DropdownMenuTrigger>
