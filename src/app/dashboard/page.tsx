@@ -32,20 +32,24 @@ export default function Dashboard() {
   }
 
   return (
-    <DashboardLayout>
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-        {error ? (
-          <div>
-            <p className="text-red-500 mb-4">
-              Could not load stats: {error.message}
-            </p>
-            <StatsOverview stats={fallbackStats} />
+    <div className="bg-white dark:bg-gray-900 min-h-screen p-4 md:p-6">
+      <div className="max-w-7xl mx-auto">
+        <DashboardLayout>
+          <div className="p-4">
+            <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+            {error ? (
+              <div>
+                <p className="text-red-500 mb-4">
+                  Could not load stats: {error.message}
+                </p>
+                <StatsOverview stats={fallbackStats} />
+              </div>
+            ) : (
+              <StatsOverview stats={stats || fallbackStats} />
+            )}
           </div>
-        ) : (
-          <StatsOverview stats={stats || fallbackStats} />
-        )}
+        </DashboardLayout>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

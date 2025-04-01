@@ -55,7 +55,7 @@ export default function VideoCard({ video }: VideoCardProps) {
 
   return (
     <div
-      className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group"
+      className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md dark:shadow-gray-900/20 transition-all duration-300 group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -111,7 +111,7 @@ export default function VideoCard({ video }: VideoCardProps) {
 
           <div className="flex-1 min-w-0">
             <Link href={`/video/${video._id}`}>
-              <h3 className="text-base font-bold text-gray-900 leading-tight line-clamp-2 hover:text-blue-600 transition-colors">
+              <h3 className="text-base font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                 {video.title}
               </h3>
             </Link>
@@ -119,15 +119,15 @@ export default function VideoCard({ video }: VideoCardProps) {
             {owner && (
               <Link
                 href={`/channel/${owner.username}`}
-                className="text-xs text-gray-600 hover:text-blue-600 transition-colors mt-1 block"
+                className="text-xs text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mt-1 block"
               >
                 {owner.fullname || owner.username}
               </Link>
             )}
 
-            <p className="text-xs text-gray-500 mt-1">{timeAgo}</p>
-
-            
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {timeAgo}
+            </p>
           </div>
         </div>
       </div>

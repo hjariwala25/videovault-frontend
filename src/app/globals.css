@@ -43,80 +43,141 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-:root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  :root {
+    /* Light mode - Airy Modern */
+    --background: 248, 250, 252;
+    --foreground: 15, 23, 42;
+    --card: 255, 255, 255;
+    --card-foreground: 15, 23, 42;
+    --border: 226, 232, 240;
+    --input: 226, 232, 240;
+    --ring: 99, 102, 241;
+
+    /* Primary: Indigo */
+    --primary: 99, 102, 241;
+    --primary-foreground: 255, 255, 255;
+
+    /* Secondary: Soft indigo */
+    --secondary: 243, 244, 255;
+    --secondary-foreground: 79, 70, 229;
+
+    /* Accent: Vibrant pink */
+    --accent: 244, 114, 182;
+    --accent-foreground: 255, 255, 255;
+
+    --destructive: 239, 68, 68;
+    --destructive-foreground: 255, 255, 255;
+
+    --muted: 241, 245, 249;
+    --muted-foreground: 100, 116, 139;
+
+    --popover: 255, 255, 255;
+    --popover-foreground: 15, 23, 42;
+
+    --radius: 0.625rem;
+
+    /* Special gradients */
+    --gradient-primary: linear-gradient(to right, #6366f1, #8b5cf6, #d946ef);
+    --gradient-subtle: linear-gradient(
+      to right,
+      rgba(99, 102, 241, 0.1),
+      rgba(217, 70, 239, 0.1)
+    );
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.5);
   }
+
+  .dark {
+    /* Dark mode - Cinematic Modern */
+    --background: 15, 23, 42;
+    --foreground: 248, 250, 252; /* Slightly brighter white */
+    --card: 30, 41, 59;
+    --card-foreground: 248, 250, 252;
+    --border: 51, 65, 85;
+    --input: 51, 65, 85;
+    --ring: 99, 102, 241;
+
+    /* Primary: Electric indigo */
+    --primary: 129, 140, 248;
+    --primary-foreground: 15, 23, 42;
+
+    /* Secondary: Deep slate */
+    --secondary: 51, 65, 85;
+    --secondary-foreground: 226, 232, 240;
+
+    /* Accent: Electric pink */
+    --accent: 244, 114, 182;
+    --accent-foreground: 15, 23, 42;
+
+    --destructive: 248, 113, 113;
+    --destructive-foreground: 15, 23, 42;
+
+    --muted: 51, 65, 85;
+    --muted-foreground: 176, 190, 205; /* Brighter gray */
+
+    --popover: 30, 41, 59;
+    --popover-foreground: 248, 250, 252;
+
+    /* Special gradients and effects */
+    --gradient-primary: linear-gradient(to right, #818cf8, #a78bfa, #f472b6);
+    --gradient-subtle: linear-gradient(
+      to right,
+      rgba(129, 140, 248, 0.15),
+      rgba(244, 114, 182, 0.15)
+    );
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-border: rgba(51, 65, 85, 0.5);
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+}
+
+/* Custom utilities */
+@layer utilities {
+  /* Add these utility classes for consistent text visibility */
+  .text-adaptive-gray {
+    @apply text-gray-700 dark:text-gray-300;
+  }
+
+  .text-adaptive-muted {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+
+  .text-adaptive-heading {
+    @apply text-gray-900 dark:text-white;
+  }
+
+  /* Keep existing utility classes */
+  .glass-effect {
+    @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-md backdrop-saturate-150 
+          border border-white/40 dark:border-gray-800/40;
+  }
+
+  .gradient-text {
+    @apply text-transparent bg-clip-text;
+    background-image: var(--gradient-primary);
+  }
+
+  .gradient-bg {
+    background-image: var(--gradient-primary);
+  }
+
+  .gradient-subtle-bg {
+    background-image: var(--gradient-subtle);
+  }
+
+  .glass-effect-light {
+    @apply bg-white/90 backdrop-blur-md;
+  }
+
+  .glass-effect-dark {
+    @apply dark:bg-gray-900/90 dark:backdrop-blur-md;
   }
 }

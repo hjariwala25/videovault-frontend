@@ -24,6 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export default function Header() {
   const { data: user } = useCurrentUser();
@@ -61,7 +62,9 @@ export default function Header() {
   return (
     <header
       className={`sticky top-0 z-50 backdrop-blur-md transition-all duration-300 ${
-        scrolled ? "bg-white/90 shadow-md" : "bg-white"
+        scrolled
+          ? "bg-white/90 dark:bg-gray-900/90 shadow-md dark:shadow-gray-950/20"
+          : "bg-white dark:bg-gray-900"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -69,7 +72,7 @@ export default function Header() {
           {/* Logo and mobile menu button */}
           <div className="flex items-center">
             <button
-              className="inline-flex items-center justify-center mr-2 md:hidden text-gray-700 hover:text-blue-600 transition-colors"
+              className="inline-flex items-center justify-center mr-2 md:hidden text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -104,7 +107,7 @@ export default function Header() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-200">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors duration-200">
               <Search size={18} />
             </div>
             <button
@@ -117,17 +120,18 @@ export default function Header() {
 
           {/* Navigation and profile */}
           <div className="flex items-center space-x-1 sm:space-x-3">
+            <ThemeToggle />
             {user ? (
               <>
                 <Link
                   href="/dashboard/upload"
-                  className="p-2 text-gray-700 hover:text-blue-600 rounded-full hover:bg-blue-50 transition-all duration-200"
+                  className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200"
                 >
                   <Upload size={20} />
                 </Link>
 
                 <button
-                  className="p-2 text-gray-700 hover:text-blue-600 rounded-full hover:bg-blue-50 transition-all duration-200"
+                  className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200"
                   onClick={() => router.push("/notifications")}
                 >
                   <Bell size={20} />
@@ -151,18 +155,20 @@ export default function Header() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="w-56 p-1 rounded-xl shadow-lg border border-gray-100 overflow-hidden"
+                    className="w-56 p-1 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800"
                   >
-                    <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 mb-1">
-                      <div className="font-bold text-gray-900">
+                    <div className="p-3 gradient-subtle-bg mb-1">
+                      <div className="font-bold text-gray-900 dark:text-white">
                         @{user.username}
                       </div>
-                      <div className="text-sm text-gray-500">{user.email}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300">
+                        {user.email}
+                      </div>
                     </div>
 
                     <DropdownMenuItem
                       onClick={() => router.push(`/channel/${user.username}`)}
-                      className="rounded-lg py-2 my-1 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      className="rounded-lg py-2 my-1 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                     >
                       <User className="mr-2 h-4 w-4" />
                       <span>Your Channel</span>
@@ -170,7 +176,7 @@ export default function Header() {
 
                     <DropdownMenuItem
                       onClick={() => router.push("/dashboard")}
-                      className="rounded-lg py-2 my-1 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      className="rounded-lg py-2 my-1 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                     >
                       <Home className="mr-2 h-4 w-4" />
                       <span>Dashboard</span>
@@ -178,7 +184,7 @@ export default function Header() {
 
                     <DropdownMenuItem
                       onClick={() => router.push("/settings")}
-                      className="rounded-lg py-2 my-1 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      className="rounded-lg py-2 my-1 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                     >
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
@@ -188,7 +194,7 @@ export default function Header() {
 
                     <DropdownMenuItem
                       onClick={handleLogout}
-                      className="rounded-lg py-2 my-1 hover:bg-red-50 hover:text-red-600 transition-colors"
+                      className="rounded-lg py-2 my-1 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Logout</span>
@@ -235,7 +241,7 @@ export default function Header() {
               />
               <Search
                 size={18}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
               />
             </div>
             <button

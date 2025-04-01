@@ -33,7 +33,7 @@ export default function MainLayout({
   if (!isClient) return null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
 
       <div className="flex flex-1">
@@ -42,32 +42,36 @@ export default function MainLayout({
 
         {/* Mobile Sidebar Toggle */}
         <button
-          className="md:hidden fixed bottom-4 left-4 z-20 p-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg"
+          className="md:hidden fixed bottom-6 left-6 z-20 p-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg backdrop-blur-sm hover:scale-105 transition-all duration-300"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
-          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+          {sidebarOpen ? (
+            <X size={24} className="animate-in fade-in duration-200" />
+          ) : (
+            <Menu size={24} className="animate-in fade-in duration-200" />
+          )}
         </button>
 
         {/* Mobile Sidebar Overlay */}
         {sidebarOpen && (
           <div
-            className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-30 transition-opacity duration-200 ease-in-out"
+            className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-30 transition-all duration-300 animate-in fade-in"
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
         {/* Mobile Sidebar */}
         <div
-          className={`md:hidden fixed inset-y-0 left-0 w-64 bg-white shadow-xl z-40 overflow-y-auto transform transition-transform duration-300 ease-in-out ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          className={`md:hidden fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 shadow-2xl z-40 overflow-y-auto transform transition-all duration-300 ease-out ${
+            sidebarOpen ? "translate-x-0 rounded-r-2xl" : "-translate-x-full"
           }`}
         >
           <Sidebar />
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 p-4 max-w-7xl mx-auto w-full pb-16">
-          <div className="transition-opacity duration-300 ease-in-out opacity-100">
+        <main className="flex-1 p-4 max-w-7xl mx-auto w-full pb-24 text-gray-900 dark:text-gray-100">
+          <div className="transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-bottom-4">
             {children}
           </div>
         </main>
@@ -76,36 +80,39 @@ export default function MainLayout({
       {/* Scroll to top button */}
       <button
         onClick={scrollToTop}
-        className={`fixed bottom-4 right-4 z-20 p-3 rounded-full bg-white text-blue-600 shadow-md hover:shadow-lg border border-gray-100 transition-all duration-200 ${
+        className={`fixed bottom-6 right-6 z-20 p-3 rounded-full bg-white dark:bg-gray-800 text-blue-600 shadow-lg hover:shadow-xl border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm hover:scale-105 ${
           showScrollTop
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-10 pointer-events-none"
         }`}
       >
-        <ArrowUp size={20} />
+        <ArrowUp size={20} strokeWidth={2.5} />
       </button>
 
       {/* Footer */}
-      <footer className="bg-white shadow-inner mt-auto">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 md:flex md:items-center md:justify-between">
+      <footer className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 mt-auto backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 md:flex md:items-center md:justify-between">
           <div className="text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start text-blue-600 font-bold text-xl mb-2">
+            <div className="flex items-center justify-center md:justify-start text-blue-600 font-bold text-xl mb-3">
               <svg
                 viewBox="0 0 24 24"
-                className="h-6 w-6 mr-2"
+                className="h-7 w-7 mr-2 drop-shadow-sm"
                 fill="currentColor"
               >
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
               </svg>
-              <span>VideoVault</span>
+              <span className="tracking-tight">VideoVault</span>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               The home for your creative content
             </p>
           </div>
           <div className="mt-6 md:mt-0 flex flex-col items-center md:items-end">
-            <div className="flex space-x-6 text-gray-600">
-              <a href="#" className="hover:text-blue-600 transition-colors">
+            <div className="flex space-x-6 text-gray-600 dark:text-gray-400">
+              <a
+                href="#"
+                className="hover:text-blue-600 transition-colors hover:scale-110 transition-transform duration-200"
+              >
                 <span className="sr-only">Twitter</span>
                 <svg
                   className="h-6 w-6"
@@ -116,7 +123,10 @@ export default function MainLayout({
                   <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
                 </svg>
               </a>
-              <a href="#" className="hover:text-blue-600 transition-colors">
+              <a
+                href="#"
+                className="hover:text-blue-600 transition-colors hover:scale-110 transition-transform duration-200"
+              >
                 <span className="sr-only">GitHub</span>
                 <svg
                   className="h-6 w-6"
@@ -132,7 +142,7 @@ export default function MainLayout({
                 </svg>
               </a>
             </div>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
               © {new Date().getFullYear()} VideoVault. All rights reserved.
             </p>
           </div>
