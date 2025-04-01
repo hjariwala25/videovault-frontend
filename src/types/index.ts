@@ -13,6 +13,8 @@ export interface User {
   }
   
   export interface Video {
+    ownerDetails: any;
+    tags: boolean;
     _id: string;
     videoFile: string;
     thumbnail: string;
