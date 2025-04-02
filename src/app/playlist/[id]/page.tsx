@@ -55,81 +55,53 @@ export default function PlaylistPage() {
     console.log("Raw playlist data:", playlist);
 
     try {
-      let extractedIds = [];
+      // The API response has a very specific structure:
+      // playlist.playlistVideos[0].videos contains the fully populated video objects
 
-      // Extract video IDs from the nested array structure in playlist.videos
-      if (playlist.videos && Array.isArray(playlist.videos)) {
-        // This handles the nested structure [['id'], ['id'], ['id']]
-        extractedIds = playlist.videos.map((item: string | string[]) =>
-          Array.isArray(item) ? item[0] : item
-        );
-        console.log("Found video IDs in playlist.videos:", extractedIds);
-      } else if (
-        playlist.playlist?.videos &&
-        Array.isArray(playlist.playlist.videos)
+      if (
+        playlist.playlistVideos &&
+        Array.isArray(playlist.playlistVideos) &&
+        playlist.playlistVideos.length > 0 &&
+        playlist.playlistVideos[0].videos
       ) {
-        extractedIds = playlist.playlist.videos.map((item: string | string[]) =>
-          Array.isArray(item) ? item[0] : item
-        );
+        // These are the complete video objects with all details including thumbnails
+        const completeVideos = playlist.playlistVideos[0].videos;
         console.log(
-          "Found video IDs in playlist.playlist.videos:",
-          extractedIds
+          "Found complete videos in playlistVideos:",
+          completeVideos.length
         );
-      }
 
-      setVideoIds(extractedIds);
+        // Use the complete video objects directly
+        setProcessedVideos(completeVideos);
 
-      // Create a map of video objects by ID for faster lookups
-      const videoMap: { [key: string]: Video } = {};
-      if (playlist.playlistVideos && Array.isArray(playlist.playlistVideos)) {
-        playlist.playlistVideos.forEach((video: Video) => {
-          if (video && video._id) {
-            videoMap[video._id] = video;
-          }
-        });
-        console.log(
-          "Video map created with",
-          Object.keys(videoMap).length,
-          "videos"
-        );
-      }
+        // Also set videoIds for any additional processing if needed
+        const ids = completeVideos.map((video: Video) => video._id);
+        setVideoIds(ids);
+      } else {
+        // Fallback to extracting IDs if the structure is different
+        let extractedIds = [];
 
-      // If we need to fetch additional video details
-      // For each video ID, either use the existing object or fetch the details
-      const videoObjects = extractedIds.map((id: string) => {
-        if (videoMap[id]) {
-          console.log("Using existing video object for:", id);
-          const video = videoMap[id];
+        if (playlist.videos && Array.isArray(playlist.videos)) {
+          extractedIds = playlist.videos.map((item: string | string[]) =>
+            Array.isArray(item) ? item[0] : item
+          );
+          console.log("Falling back to IDs in playlist.videos:", extractedIds);
+          setVideoIds(extractedIds);
 
-          // Ensure essential fields have values
-          return {
-            ...video,
-            _id: id,
-            title: video.title || `Video ${id.slice(-5)}`,
-            thumbnail: video.thumbnail || "/default-thumbnail.png",
-            description: video.description || "No description available",
-            views: video.views || 0,
-            duration: video.duration || 0,
-            createdAt: video.createdAt || new Date().toISOString(),
-          };
-        } else {
-          console.log("Creating placeholder for:", id);
-          // Create improved placeholder with the ID that will link correctly
-          return {
+          // Create placeholder objects
+          const placeholders = extractedIds.map((id: string) => ({
             _id: id,
             title: `Video ${id.slice(-5)}`,
-            thumbnail:
-              `/api/video/v/${id}/thumbnail` || "/default-thumbnail.png", // Try direct thumbnail URL if available
+            thumbnail: "/default-thumbnail.png",
             description: "Loading video details...",
             views: 0,
             duration: 0,
             createdAt: new Date().toISOString(),
-          };
-        }
-      });
+          }));
 
-      console.log("Final processed videos:", videoObjects);
-      setProcessedVideos(videoObjects);
+          setProcessedVideos(placeholders);
+        }
+      }
     } catch (error) {
       console.error("Error processing playlist data:", error);
       setProcessedVideos([]);
@@ -148,14 +120,14 @@ export default function PlaylistPage() {
     const currentVideos = [...processedVideos];
 
     // Create a map of video objects by ID for faster lookups
-    const videoMap: { [key: string]: any } = {};
+    const videoMap: { [key: string]: Video } = {};
 
     // Handle both array and object responses
     const videos = Array.isArray(videoDetails)
       ? videoDetails
       : videoDetails?.videos || videoDetails?.data || [];
 
-    videos.forEach((video: any) => {
+    videos.forEach((video: Video) => {
       if (video && video._id) {
         videoMap[video._id] = video;
       }
@@ -227,7 +199,7 @@ export default function PlaylistPage() {
   const thumbnailImage =
     processedVideos.length > 0 && processedVideos[0]?.thumbnail
       ? processedVideos[0].thumbnail
-      : "/default-thumbnail.png"; 
+      : "/default-thumbnail.png";
 
   return (
     <MainLayout>
@@ -245,38 +217,6 @@ export default function PlaylistPage() {
                 height={400}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute top-4 right-4 z-30">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="bg-black/40 border-gray-600 hover:bg-black/60 text-white h-9 w-9"
-                    >
-                      <MoreVertical className="h-5 w-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
-                  >
-                    <DropdownMenuItem
-                      onClick={() => setShowEditModal(true)}
-                      className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer"
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit Playlist
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setShowDeleteDialog(true)}
-                      className="text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 cursor-pointer"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete Playlist
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
               <div className="absolute bottom-0 left-0 right-0 z-20 p-6">
                 <h1 className="text-3xl font-bold text-white mb-2">
                   {playlist?.name}
@@ -313,9 +253,44 @@ export default function PlaylistPage() {
 
         {/* Video Grid */}
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-            Videos in this playlist
-          </h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Videos in this playlist
+            </h2>
+
+            {/* Moved dropdown menu here */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  <MoreVertical className="h-4 w-4 mr-1" />
+                  <span className="text-sm">Manage</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
+              >
+                <DropdownMenuItem
+                  onClick={() => setShowEditModal(true)}
+                  className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer"
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit Playlist
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 cursor-pointer"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Playlist
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
           {processedVideos.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
