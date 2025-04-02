@@ -1,4 +1,5 @@
-import { DashboardStats } from '@/types';
+import { DashboardStats } from "@/types";
+import { Users, ThumbsUp, Eye, Film } from "lucide-react";
 
 interface StatsOverviewProps {
   stats: DashboardStats;
@@ -6,22 +7,53 @@ interface StatsOverviewProps {
 
 export default function StatsOverview({ stats }: StatsOverviewProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold">Total Subscribers</h3>
-        <p className="text-2xl">{stats.totalSubscribers}</p>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="bg-white dark:bg-black/40 rounded-xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-all duration-300">
+        <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-2.5 rounded-lg inline-flex mb-3">
+          <Users size={22} className="text-white" />
+        </div>
+        <h3 className="text-gray-600 dark:text-gray-400 font-medium text-sm uppercase tracking-wider">
+          Subscribers
+        </h3>
+        <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1.5">
+          {stats.totalSubscribers.toLocaleString()}
+        </p>
       </div>
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold">Total Likes</h3>
-        <p className="text-2xl">{stats.totalLikes}</p>
+
+      <div className="bg-white dark:bg-black/40 rounded-xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-all duration-300">
+        <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-2.5 rounded-lg inline-flex mb-3">
+          <ThumbsUp size={22} className="text-white" />
+        </div>
+        <h3 className="text-gray-600 dark:text-gray-400 font-medium text-sm uppercase tracking-wider">
+          Total Likes
+        </h3>
+        <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1.5">
+          {stats.totalLikes.toLocaleString()}
+        </p>
       </div>
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold">Total Views</h3>
-        <p className="text-2xl">{stats.totalViews}</p>
+
+      <div className="bg-white dark:bg-black/40 rounded-xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-all duration-300">
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-2.5 rounded-lg inline-flex mb-3">
+          <Eye size={22} className="text-white" />
+        </div>
+        <h3 className="text-gray-600 dark:text-gray-400 font-medium text-sm uppercase tracking-wider">
+          Total Views
+        </h3>
+        <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1.5">
+          {stats.totalViews.toLocaleString()}
+        </p>
       </div>
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold">Total Videos</h3>
-        <p className="text-2xl">{stats.totalVideos}</p>
+
+      <div className="bg-white dark:bg-black/40 rounded-xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-all duration-300">
+        <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-2.5 rounded-lg inline-flex mb-3">
+          <Film size={22} className="text-white" />
+        </div>
+        <h3 className="text-gray-600 dark:text-gray-400 font-medium text-sm uppercase tracking-wider">
+          Total Videos
+        </h3>
+        <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1.5">
+          {stats.totalVideos.toLocaleString()}
+        </p>
       </div>
     </div>
   );

@@ -78,21 +78,23 @@ export default function VideoPage() {
 
         {/* Title and like button in same row */}
         <div className="flex justify-between items-center mt-4">
-          <h1 className="text-2xl font-bold pr-4">{video.title}</h1>
+          <h1 className="text-2xl font-bold pr-4 text-gray-900 dark:text-white">
+            {video.title}
+          </h1>
 
           <Button
             variant="outline"
             size="sm"
             onClick={() => toggleLike.mutate(videoId)}
             disabled={toggleLike.isPending}
-            className="flex-shrink-0"
+            className="flex-shrink-0 border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/40 hover:text-blue-600 dark:hover:text-blue-400"
           >
             {video.isLiked ? "Unlike" : "Like"} ({video.likesCount || 0})
           </Button>
         </div>
 
         {/* Video stats and upload info */}
-        <div className="flex items-center mt-2 text-sm text-gray-600">
+        <div className="flex items-center mt-2 text-sm text-gray-600 dark:text-gray-300">
           <div className="flex items-center gap-3">
             <span>{video.views || 0} views</span>
             <span>•</span>
@@ -101,7 +103,7 @@ export default function VideoPage() {
         </div>
 
         {/* Creator profile section */}
-        <div className="flex items-center mt-6 mb-6 pb-4 border-b border-gray-200">
+        <div className="flex items-center mt-6 mb-6 pb-4 border-b border-gray-200 dark:border-gray-800">
           {owner ? (
             <Link
               href={`/channel/${owner.username}`}
@@ -113,18 +115,20 @@ export default function VideoPage() {
                   alt={owner.username}
                   width={48}
                   height={48}
-                  className="rounded-full border-2 border-white shadow-sm group-hover:border-blue-200 transition-all"
+                  className="rounded-full border-2 border-white dark:border-gray-800 shadow-sm group-hover:border-blue-200 dark:group-hover:border-blue-700 transition-all"
                 />
               </div>
               <div>
-                <p className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors flex items-center">
+                <p className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex items-center">
                   {owner.fullname || owner.username}
                   <ExternalLink size={14} className="ml-1.5 opacity-60" />
                 </p>
-                <p className="text-xs text-gray-500">@{owner.username}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  @{owner.username}
+                </p>
                 {/* Subscriber count  */}
                 {/* {owner.subscribersCount !== undefined && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {owner.subscribersCount.toLocaleString()} subscribers
                   </p>
                 )} */}
@@ -138,17 +142,17 @@ export default function VideoPage() {
                   alt="Channel"
                   width={48}
                   height={48}
-                  className="rounded-full border-2 border-white shadow-sm"
+                  className="rounded-full border-2 border-white dark:border-gray-800 shadow-sm"
                 />
               </div>
               <div>
-                <p className="font-medium text-gray-900">
+                <p className="font-medium text-gray-900 dark:text-white">
                   {video.ownerDetails?.fullname ||
                     video.ownerDetails?.username ||
                     "Channel"}
                 </p>
                 {video.ownerDetails?.username && (
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     @{video.ownerDetails.username}
                   </p>
                 )}
@@ -160,7 +164,7 @@ export default function VideoPage() {
           {owner && currentUser && owner._id !== currentUser._id && (
             <Button
               variant="outline"
-              className="ml-auto"
+              className="ml-auto border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/40 hover:text-blue-600 dark:hover:text-blue-400"
               // Replace with your subscription mutation
               // onClick={() => subscribeToChannel.mutate(owner._id)}
             >
@@ -170,14 +174,16 @@ export default function VideoPage() {
         </div>
 
         {/* Video description */}
-        <div className="bg-gray-50 p-4 rounded-lg mb-6">
-          <p className="text-gray-700 whitespace-pre-line">
+        <div className="bg-gray-50 dark:bg-black/40 p-4 rounded-lg mb-6">
+          <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
             {video.description}
           </p>
         </div>
 
         <div className="mt-6">
-          <h2 className="text-xl font-semibold">Comments</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Comments
+          </h2>
           {currentUser && (
             <CommentForm
               onSubmit={(content) => addComment.mutate({ videoId, content })}
@@ -194,7 +200,9 @@ export default function VideoPage() {
               ))}
             </div>
           ) : (
-            <p className="text-center mt-4 text-gray-500">No comments yet</p>
+            <p className="text-center mt-4 text-gray-500 dark:text-gray-400">
+              No comments yet
+            </p>
           )}
         </div>
       </div>

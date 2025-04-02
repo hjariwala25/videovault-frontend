@@ -55,7 +55,7 @@ export default function VideoCard({ video }: VideoCardProps) {
 
   return (
     <div
-      className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md dark:shadow-gray-900/20 transition-all duration-300 group"
+      className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md dark:shadow-gray-900/20 transition-all duration-300 group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

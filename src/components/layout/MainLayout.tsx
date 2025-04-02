@@ -33,7 +33,7 @@ export default function MainLayout({
   if (!isClient) return null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-black">
       <Header />
 
       <div className="flex flex-1">
@@ -62,7 +62,7 @@ export default function MainLayout({
 
         {/* Mobile Sidebar */}
         <div
-          className={`md:hidden fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 shadow-2xl z-40 overflow-y-auto transform transition-all duration-300 ease-out ${
+          className={`md:hidden fixed inset-y-0 left-0 w-64 bg-white dark:bg-black shadow-2xl dark:shadow-[#333]/20 z-40 overflow-y-auto transform transition-all duration-300 ease-out ${
             sidebarOpen ? "translate-x-0 rounded-r-2xl" : "-translate-x-full"
           }`}
         >
@@ -80,7 +80,7 @@ export default function MainLayout({
       {/* Scroll to top button */}
       <button
         onClick={scrollToTop}
-        className={`fixed bottom-6 right-6 z-20 p-3 rounded-full bg-white dark:bg-gray-800 text-blue-600 shadow-lg hover:shadow-xl border border-gray-100 dark:border-gray-700 transition-all duration-300 backdrop-blur-sm hover:scale-105 ${
+        className={`fixed bottom-6 right-6 z-20 p-3 rounded-full bg-white dark:bg-black text-blue-600 shadow-lg hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 backdrop-blur-sm hover:scale-105 ${
           showScrollTop
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-10 pointer-events-none"
@@ -90,7 +90,7 @@ export default function MainLayout({
       </button>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 mt-auto backdrop-blur-sm">
+      <footer className="bg-white dark:bg-black border-t border-gray-100 dark:border-gray-800 mt-auto">
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 md:flex md:items-center md:justify-between">
           <div className="text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start text-blue-600 font-bold text-xl mb-3">
@@ -111,7 +111,7 @@ export default function MainLayout({
             <div className="flex space-x-6 text-gray-600 dark:text-gray-400">
               <a
                 href="#"
-                className="hover:text-blue-600 transition-colors hover:scale-110 transition-transform duration-200"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors hover:scale-110 transition-transform duration-200"
               >
                 <span className="sr-only">Twitter</span>
                 <svg
@@ -125,7 +125,7 @@ export default function MainLayout({
               </a>
               <a
                 href="#"
-                className="hover:text-blue-600 transition-colors hover:scale-110 transition-transform duration-200"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors hover:scale-110 transition-transform duration-200"
               >
                 <span className="sr-only">GitHub</span>
                 <svg
