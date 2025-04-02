@@ -104,7 +104,7 @@ export default function Channel() {
               {channel?.fullname || "User"}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {channel?.username ? `@${channel.username}` : ""}
+              @{channel?.username || params.username || ""}
             </p>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
               <span className="font-medium text-gray-900 dark:text-white">
