@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '@/services/api';
-import { queryKeys } from '@/lib/queryKeys';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import api from "@/services/api";
+import { queryKeys } from "@/lib/queryKeys";
 // import { Video } from '@/types';
 
 // Get videos with optional filtering
@@ -8,7 +8,7 @@ export function useVideos(params = {}) {
   return useQuery({
     queryKey: queryKeys.videos.list(params),
     queryFn: async () => {
-      const response = await api.get('/video/videos', { params });
+      const response = await api.get("/video/videos", { params });
       return response.data.data;
     },
   });
@@ -26,13 +26,48 @@ export function useVideoById(videoId: string) {
   });
 }
 
+// Get multiple videos by IDs
+export function useVideosByIds(videoIds: string[]) {
+  return useQuery({
+    queryKey: queryKeys.videos.byIds(videoIds),
+    queryFn: async () => {
+      if (!videoIds.length) return [];
+
+      // Try to fetch each video individually since the batch endpoint may not be working
+      console.log("Fetching individual videos for IDs:", videoIds);
+      const videos = [];
+
+      for (const id of videoIds) {
+        try {
+          // Use the same endpoint pattern as useVideoById
+          const response = await api.get(`/video/v/${id}`);
+          console.log(`Fetched video ${id}:`, response.data);
+
+          if (response.data.data) {
+            videos.push(response.data.data);
+          } else if (response.data) {
+            // Handle case where data might not be nested under .data
+            videos.push(response.data);
+          }
+        } catch (error) {
+          console.error(`Error fetching video ${id}:`, error);
+        }
+      }
+
+      console.log("Successfully fetched videos:", videos.length);
+      return videos;
+    },
+    enabled: videoIds.length > 0,
+  });
+}
+
 // Upload video
 export function useUploadVideo() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (formData: FormData) => {
-      const response = await api.post('/video/videos', formData);
+      const response = await api.post("/video/videos", formData);
       return response.data.data;
     },
     onSuccess: () => {
@@ -45,7 +80,7 @@ export function useUploadVideo() {
 // Update video
 export function useUpdateVideo(videoId: string) {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (data: FormData) => {
       const response = await api.patch(`/video/v/${videoId}`, data);
@@ -62,7 +97,7 @@ export function useUpdateVideo(videoId: string) {
 // Delete video
 export function useDeleteVideo() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (videoId: string) => {
       await api.delete(`/video/v/${videoId}`);
@@ -79,7 +114,7 @@ export function useDeleteVideo() {
 // Toggle publish status
 export function useTogglePublishStatus() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (videoId: string) => {
       const response = await api.patch(`/video/toggle/publish/${videoId}`);

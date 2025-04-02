@@ -15,6 +15,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import VideoActions from "@/components/video/VideoActions";
 
 export default function VideoPage() {
   const params = useParams();
@@ -179,6 +180,8 @@ export default function VideoPage() {
             {video.description}
           </p>
         </div>
+
+        <VideoActions videoId={video._id} />
 
         <div className="mt-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">

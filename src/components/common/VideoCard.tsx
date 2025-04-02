@@ -1,9 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Video } from "@/types";
-import { Clock, Play } from "lucide-react";
+import { Clock, Play, Save } from "lucide-react";
 import { useState } from "react";
 import { formatDistanceToNow as formatDistance } from "date-fns";
+import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
 
 interface VideoCardProps {
   video: Video;
@@ -11,17 +12,21 @@ interface VideoCardProps {
 
 export default function VideoCard({ video }: VideoCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [showPlaylistModal, setShowPlaylistModal] = useState(false);
 
   // Handle owner data which might be a string ID or an object
   const owner = typeof video.owner === "string" ? null : video.owner;
 
-  // Format the timestamp
-  const timeAgo = formatDistance(new Date(video.createdAt), {
-    addSuffix: true,
-  });
+  // Format the timestamp with proper error handling
+  const timeAgo = video.createdAt
+    ? formatDistance(new Date(video.createdAt), new Date(), {
+        addSuffix: true,
+      })
+    : "Recently added";
 
   // Format view count
   const formatViews = (views: number) => {
+    if (!views && views !== 0) return "0";
     if (views >= 1000000) {
       return (views / 1000000).toFixed(1) + "M";
     } else if (views >= 1000) {
@@ -30,28 +35,27 @@ export default function VideoCard({ video }: VideoCardProps) {
     return views.toString();
   };
 
-  // Format duration to MM:SS format
-  const formatDuration = (duration: string | number | undefined) => {
-    if (!duration) return "0:00";
+  // Format duration to MM:SS format with fallback
+  const formatDuration = (duration: number | string | undefined) => {
+    if (!duration) return "00:00";
 
-    // If already formatted as MM:SS, return as is
-    if (typeof duration === "string" && duration.includes(":")) {
-      return duration;
+    let seconds = 0;
+    if (typeof duration === "string") {
+      // Try to parse the string as a number
+      seconds = parseInt(duration, 10) || 0;
+    } else {
+      seconds = duration;
     }
 
-    // Convert to number of seconds if it's not already
-    const totalSeconds =
-      typeof duration === "number" ? duration : parseInt(duration);
-
-    if (isNaN(totalSeconds)) return "0:00";
-
-    // Calculate minutes and seconds
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = Math.floor(totalSeconds % 60);
-
-    // Format with leading zero for seconds if needed
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+      .toString()
+      .padStart(2, "0")}`;
   };
+
+  // Get a valid href
+  const href = `/video/${video._id}`;
 
   return (
     <div
@@ -59,10 +63,7 @@ export default function VideoCard({ video }: VideoCardProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link
-        href={`/video/${video._id}`}
-        className="block relative aspect-video overflow-hidden"
-      >
+      <Link href={href} className="block relative aspect-video overflow-hidden">
         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 flex items-center justify-center">
           <div className="bg-white/90 rounded-full p-3 transform scale-0 group-hover:scale-100 transition-transform duration-300">
             <Play size={20} className="text-blue-600" />
@@ -89,6 +90,18 @@ export default function VideoCard({ video }: VideoCardProps) {
           <Clock size={10} className="mr-1" />
           {formatViews(video.views || 0)} views
         </div>
+
+        {/* Save button */}
+        <button
+          onClick={(e) => {
+            e.preventDefault(); // Stop link navigation
+            e.stopPropagation();
+            setShowPlaylistModal(true);
+          }}
+          className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-blue-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-20"
+        >
+          <Save className="w-4 h-4" />
+        </button>
       </Link>
 
       <div className="p-3 pb-4">
@@ -131,6 +144,12 @@ export default function VideoCard({ video }: VideoCardProps) {
           </div>
         </div>
       </div>
+
+      <AddToPlaylistModal
+        isOpen={showPlaylistModal}
+        onClose={() => setShowPlaylistModal(false)}
+        videoId={video._id}
+      />
     </div>
   );
 }
