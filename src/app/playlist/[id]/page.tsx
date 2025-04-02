@@ -258,7 +258,6 @@ export default function PlaylistPage() {
               Videos in this playlist
             </h2>
 
-            {/* Moved dropdown menu here */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
