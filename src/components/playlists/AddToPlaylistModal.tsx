@@ -23,6 +23,7 @@ interface AddToPlaylistModalProps {
   isOpen: boolean;
   onClose: () => void;
   videoId: string;
+  currentPlaylistId?: string; 
 }
 
 export default function AddToPlaylistModal({
@@ -99,7 +100,6 @@ export default function AddToPlaylistModal({
         description: newPlaylistDescription,
       });
 
-      // If we get a playlist ID back, select it
       if (result?.data?._id) {
         setSelectedPlaylists([...selectedPlaylists, result.data._id]);
       }

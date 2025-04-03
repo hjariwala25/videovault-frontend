@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {  Share, Save } from "lucide-react";
+import { Share, Save } from "lucide-react";
 import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
 
-interface VideoActionsProps {
+export interface VideoActionsProps {
   videoId: string;
+  isInPlaylist: boolean; 
+  playlistId: string | null;
+  onPlaylistChange: () => void;
 }
 
 export default function VideoActions({ videoId }: VideoActionsProps) {
