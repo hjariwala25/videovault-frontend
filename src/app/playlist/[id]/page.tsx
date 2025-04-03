@@ -66,13 +66,16 @@ export default function PlaylistPage() {
       ) {
         // These are the complete video objects with all details including thumbnails
         const completeVideos = playlist.playlistVideos[0].videos;
-        console.log(
-          "Found complete videos in playlistVideos:",
-          completeVideos.length
-        );
+
+        // Mark these videos as already saved in this playlist
+        const markedVideos = completeVideos.map((video: Video) => ({
+          ...video,
+          isInPlaylist: true,
+          playlistId: playlistId,
+        }));
 
         // Use the complete video objects directly
-        setProcessedVideos(completeVideos);
+        setProcessedVideos(markedVideos);
 
         // Also set videoIds for any additional processing if needed
         const ids = completeVideos.map((video: Video) => video._id);
@@ -296,6 +299,8 @@ export default function PlaylistPage() {
               {processedVideos.map((video) => (
                 <div key={video._id} className="group relative">
                   <VideoCard video={video} />
+
+                  {/* Existing hover remove button */}
                   <button
                     onClick={() => handleRemoveVideo(video._id)}
                     className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
@@ -303,6 +308,23 @@ export default function PlaylistPage() {
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
+
+                  {/* New persistent remove button below the video card */}
+                  <div className="mt-2 flex justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleRemoveVideo(video._id);
+                      }}
+                      className="border-gray-200 dark:border-gray-800 text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-400"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 mr-1" />
+                      Remove
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

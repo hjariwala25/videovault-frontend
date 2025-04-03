@@ -14,8 +14,10 @@ import { Comment as CommentType } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { formatTimeAgo, formatCount } from "@/utils/formatTime";
 import VideoActions from "@/components/video/VideoActions";
+// Add this import for checking playlists
+import { useUserPlaylists } from "@/hooks/usePlaylistQueries";
 
 export default function VideoPage() {
   const params = useParams();
@@ -27,10 +29,52 @@ export default function VideoPage() {
   const addComment = useAddComment();
   const [isClient, setIsClient] = useState(false);
 
+  // This will force a refresh of the playlist check
+  const [playlistChangeCounter, setPlaylistChangeCounter] = useState(0);
+
+  // Add this to fetch user playlists with a refetch function
+  const { data: userPlaylists, refetch: refetchPlaylists } = useUserPlaylists(
+    currentUser?._id || ""
+  );
+
+  // Check if the video is in any playlist
+  const [isInPlaylist, setIsInPlaylist] = useState(false);
+  const [playlistId, setPlaylistId] = useState<string | null>(null);
+
+  // Effect to check if video is in any playlist
+  useEffect(() => {
+    if (!userPlaylists || !videoId) return;
+
+    // Reset the states first
+    setIsInPlaylist(false);
+    setPlaylistId(null);
+
+    // Check all playlists for this video
+    for (const playlist of userPlaylists) {
+      // Check if videos array exists and contains this video
+      if (playlist.videos && Array.isArray(playlist.videos)) {
+        const flattenedIds = playlist.videos.flat();
+        if (flattenedIds.includes(videoId)) {
+          setIsInPlaylist(true);
+          setPlaylistId(playlist._id);
+          break;
+        }
+      }
+    }
+
+    console.log("Checked if video is in playlist:", isInPlaylist, playlistId);
+  }, [userPlaylists, videoId, playlistChangeCounter]); // Add playlistChangeCounter to dependencies
+
   useEffect(() => {
     setIsClient(true);
     console.log("Video ID:", videoId);
   }, [videoId]);
+
+  const handlePlaylistChange = () => {
+    // This function will be called when a playlist is updated
+    refetchPlaylists();
+    setPlaylistChangeCounter((prev) => prev + 1);
+  };
 
   if (!isClient) return null;
 
@@ -60,12 +104,8 @@ export default function VideoPage() {
   // Get owner data from the video object
   const owner = typeof video.owner === "object" ? video.owner : null;
 
-  // Format the timestamp
-  const timeAgo = video.createdAt
-    ? formatDistanceToNow(new Date(video.createdAt), {
-        addSuffix: true,
-      })
-    : "";
+  // timeStamp for the video upload date
+  const timeAgo = formatTimeAgo(video.createdAt);
 
   return (
     <MainLayout>
@@ -94,10 +134,10 @@ export default function VideoPage() {
           </Button>
         </div>
 
-        {/* Video stats and upload info */}
+        {/* Video stats and upload info - use formatCount here */}
         <div className="flex items-center mt-2 text-sm text-gray-600 dark:text-gray-300">
           <div className="flex items-center gap-3">
-            <span>{video.views || 0} views</span>
+            <span>{formatCount(video.views || 0)} views</span>
             <span>•</span>
             <span>{timeAgo}</span>
           </div>
@@ -130,7 +170,7 @@ export default function VideoPage() {
                 {/* Subscriber count  */}
                 {/* {owner.subscribersCount !== undefined && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {owner.subscribersCount.toLocaleString()} subscribers
+                    {formatCount(owner.subscribersCount)} subscribers
                   </p>
                 )} */}
               </div>
@@ -181,7 +221,12 @@ export default function VideoPage() {
           </p>
         </div>
 
-        <VideoActions videoId={video._id} />
+        <VideoActions
+          videoId={video._id}
+          isInPlaylist={isInPlaylist}
+          playlistId={playlistId}
+          onPlaylistChange={handlePlaylistChange}
+        />
 
         <div className="mt-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">

@@ -1,13 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Video } from "@/types";
-import { Clock, Play, Save } from "lucide-react";
+import { Check, Clock, Play, Save } from "lucide-react";
 import { useState } from "react";
-import { formatDistanceToNow as formatDistance } from "date-fns";
+import { formatTimeAgo, formatCount } from "@/utils/formatTime";
 import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
 
+// Update the VideoCardProps interface to include optional isInPlaylist and playlistId
 interface VideoCardProps {
-  video: Video;
+  video: Video & {
+    isInPlaylist?: boolean;
+    playlistId?: string;
+  };
 }
 
 export default function VideoCard({ video }: VideoCardProps) {
@@ -17,23 +21,9 @@ export default function VideoCard({ video }: VideoCardProps) {
   // Handle owner data which might be a string ID or an object
   const owner = typeof video.owner === "string" ? null : video.owner;
 
-  // Format the timestamp with proper error handling
-  const timeAgo = video.createdAt
-    ? formatDistance(new Date(video.createdAt), new Date(), {
-        addSuffix: true,
-      })
-    : "Recently added";
-
-  // Format view count
-  const formatViews = (views: number) => {
-    if (!views && views !== 0) return "0";
-    if (views >= 1000000) {
-      return (views / 1000000).toFixed(1) + "M";
-    } else if (views >= 1000) {
-      return (views / 1000).toFixed(1) + "K";
-    }
-    return views.toString();
-  };
+  // Format time ago and view count
+  const timeAgo = formatTimeAgo(video.createdAt);
+  const viewCount = formatCount(video.views);
 
   // Format duration to MM:SS format with fallback
   const formatDuration = (duration: number | string | undefined) => {
@@ -41,7 +31,6 @@ export default function VideoCard({ video }: VideoCardProps) {
 
     let seconds = 0;
     if (typeof duration === "string") {
-      // Try to parse the string as a number
       seconds = parseInt(duration, 10) || 0;
     } else {
       seconds = duration;
@@ -54,7 +43,6 @@ export default function VideoCard({ video }: VideoCardProps) {
       .padStart(2, "0")}`;
   };
 
-  // Get a valid href
   const href = `/video/${video._id}`;
 
   return (
@@ -88,19 +76,31 @@ export default function VideoCard({ video }: VideoCardProps) {
         {/* Views badge */}
         <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded flex items-center z-20">
           <Clock size={10} className="mr-1" />
-          {formatViews(video.views || 0)} views
+          {viewCount} views
         </div>
 
-        {/* Save button */}
+        {/* Save button - updated to show "Saved" status */}
         <button
           onClick={(e) => {
-            e.preventDefault(); // Stop link navigation
+            e.preventDefault();
             e.stopPropagation();
-            setShowPlaylistModal(true);
+            // If already in playlist, don't show the modal again
+            if (!video.isInPlaylist) {
+              setShowPlaylistModal(true);
+            }
           }}
-          className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-blue-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-20"
+          className={`absolute top-2 right-2 p-1.5 ${
+            video.isInPlaylist
+              ? "bg-green-600/80 hover:bg-green-700"
+              : "bg-black/60 hover:bg-blue-600"
+          } text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-20`}
+          title={video.isInPlaylist ? "Already saved" : "Save to playlist"}
         >
-          <Save className="w-4 h-4" />
+          {video.isInPlaylist ? (
+            <Check className="w-4 h-4" />
+          ) : (
+            <Save className="w-4 h-4" />
+          )}
         </button>
       </Link>
 
@@ -145,10 +145,12 @@ export default function VideoCard({ video }: VideoCardProps) {
         </div>
       </div>
 
+      {/* Modal with updated props to check for existing videos */}
       <AddToPlaylistModal
         isOpen={showPlaylistModal}
         onClose={() => setShowPlaylistModal(false)}
         videoId={video._id}
+        currentPlaylistId={video.playlistId}
       />
     </div>
   );

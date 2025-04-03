@@ -1,12 +1,23 @@
 import { useState, useEffect } from "react";
-import { useUserPlaylists, useAddVideoToPlaylist } from "@/hooks/usePlaylistQueries";
+import {
+  useUserPlaylists,
+  useAddVideoToPlaylist,
+  useCreatePlaylist,
+} from "@/hooks/usePlaylistQueries";
 import { useCurrentUser } from "@/hooks/useUserQueries";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Playlist } from "@/types";
-import { Check, Plus, FolderPlus } from "lucide-react";
-import { Loader2 } from "lucide-react";
+import { Check, Plus, FolderPlus, Loader2 } from "lucide-react";
 
 interface AddToPlaylistModalProps {
   isOpen: boolean;
@@ -14,13 +25,23 @@ interface AddToPlaylistModalProps {
   videoId: string;
 }
 
-export default function AddToPlaylistModal({ isOpen, onClose, videoId }: AddToPlaylistModalProps) {
+export default function AddToPlaylistModal({
+  isOpen,
+  onClose,
+  videoId,
+}: AddToPlaylistModalProps) {
   const { data: currentUser } = useCurrentUser();
-  const { data: playlists, isLoading } = useUserPlaylists(currentUser?._id || "");
+  const {
+    data: playlists,
+    isLoading,
+    refetch,
+  } = useUserPlaylists(currentUser?._id || "");
   const addToPlaylistMutation = useAddVideoToPlaylist();
+  const createPlaylistMutation = useCreatePlaylist();
   const [selectedPlaylists, setSelectedPlaylists] = useState<string[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState("");
+  const [newPlaylistDescription, setNewPlaylistDescription] = useState("");
 
   // Reset selections when modal opens
   useEffect(() => {
@@ -28,13 +49,14 @@ export default function AddToPlaylistModal({ isOpen, onClose, videoId }: AddToPl
       setSelectedPlaylists([]);
       setShowCreateForm(false);
       setNewPlaylistName("");
+      setNewPlaylistDescription("");
     }
   }, [isOpen]);
 
   const togglePlaylist = (playlistId: string) => {
-    setSelectedPlaylists(prev => 
+    setSelectedPlaylists((prev) =>
       prev.includes(playlistId)
-        ? prev.filter(id => id !== playlistId)
+        ? prev.filter((id) => id !== playlistId)
         : [...prev, playlistId]
     );
   };
@@ -48,15 +70,49 @@ export default function AddToPlaylistModal({ isOpen, onClose, videoId }: AddToPl
     try {
       // Add to all selected playlists
       await Promise.all(
-        selectedPlaylists.map(playlistId => 
+        selectedPlaylists.map((playlistId) =>
           addToPlaylistMutation.mutateAsync({ playlistId, videoId })
         )
       );
-      
-      toast.success(`Added to ${selectedPlaylists.length} playlist${selectedPlaylists.length > 1 ? 's' : ''}`);
+
+      toast.success(
+        `Added to ${selectedPlaylists.length} playlist${
+          selectedPlaylists.length > 1 ? "s" : ""
+        }`
+      );
       onClose();
     } catch (error) {
       toast.error("Failed to add to playlist");
+      console.error(error);
+    }
+  };
+
+  const handleCreatePlaylist = async () => {
+    if (!newPlaylistName.trim()) {
+      toast.error("Playlist name is required");
+      return;
+    }
+
+    try {
+      const result = await createPlaylistMutation.mutateAsync({
+        name: newPlaylistName,
+        description: newPlaylistDescription,
+      });
+
+      // If we get a playlist ID back, select it
+      if (result?.data?._id) {
+        setSelectedPlaylists([...selectedPlaylists, result.data._id]);
+      }
+
+      toast.success("Playlist created successfully");
+      setShowCreateForm(false);
+      setNewPlaylistName("");
+      setNewPlaylistDescription("");
+
+      // Refresh playlists
+      refetch();
+    } catch (error) {
+      toast.error("Failed to create playlist");
       console.error(error);
     }
   };
@@ -65,10 +121,12 @@ export default function AddToPlaylistModal({ isOpen, onClose, videoId }: AddToPl
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">Save to Playlist</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+            Save to Playlist
+          </DialogTitle>
         </DialogHeader>
 
-        <div className="mt-4 max-h-[300px] overflow-y-auto">
+        <div className="mt-4 max-h-[300px] overflow-y-auto overflow-x-hidden">
           {isLoading ? (
             <div className="flex justify-center p-6">
               <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
@@ -76,7 +134,7 @@ export default function AddToPlaylistModal({ isOpen, onClose, videoId }: AddToPl
           ) : playlists && playlists.length > 0 ? (
             <div className="space-y-2">
               {playlists.map((playlist: Playlist) => (
-                <div 
+                <div
                   key={playlist._id}
                   onClick={() => togglePlaylist(playlist._id)}
                   className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
@@ -86,15 +144,23 @@ export default function AddToPlaylistModal({ isOpen, onClose, videoId }: AddToPl
                   }`}
                 >
                   <div className="flex-1">
-                    <p className="font-medium text-gray-900 dark:text-white">{playlist.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{playlist.totalVideos || 0} videos</p>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {playlist.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {playlist.totalVideos || 0} videos
+                    </p>
                   </div>
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                    selectedPlaylists.includes(playlist._id)
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 dark:bg-gray-700"
-                  }`}>
-                    {selectedPlaylists.includes(playlist._id) && <Check className="w-4 h-4" />}
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                      selectedPlaylists.includes(playlist._id)
+                        ? "bg-blue-600 dark:bg-blue-500 text-white"
+                        : "bg-gray-200 dark:bg-gray-700"
+                    }`}
+                  >
+                    {selectedPlaylists.includes(playlist._id) && (
+                      <Check className="w-4 h-4" />
+                    )}
                   </div>
                 </div>
               ))}
@@ -102,8 +168,10 @@ export default function AddToPlaylistModal({ isOpen, onClose, videoId }: AddToPl
           ) : (
             <div className="text-center p-6">
               <FolderPlus className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-600 dark:text-gray-400">You don&apos;t have any playlists yet.</p>
-              <Button 
+              <p className="text-gray-600 dark:text-gray-400">
+                You don&apos;t have any playlists yet.
+              </p>
+              <Button
                 onClick={() => setShowCreateForm(true)}
                 className="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
               >
@@ -113,8 +181,8 @@ export default function AddToPlaylistModal({ isOpen, onClose, videoId }: AddToPl
           )}
 
           {!showCreateForm && playlists && playlists.length > 0 && (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setShowCreateForm(true)}
               className="w-full mt-4 border-dashed border-2 border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/60"
             >
@@ -124,27 +192,62 @@ export default function AddToPlaylistModal({ isOpen, onClose, videoId }: AddToPl
 
           {showCreateForm && (
             <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-lg border border-gray-200 dark:border-gray-700">
-              <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Create New Playlist</h3>
-              <input
-                type="text"
-                value={newPlaylistName}
-                onChange={(e) => setNewPlaylistName(e.target.value)}
-                placeholder="Enter playlist name"
-                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md text-gray-900 dark:text-white bg-white dark:bg-gray-800"
-              />
+              <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                Create New Playlist
+              </h3>
+
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <Label
+                    htmlFor="playlist-name"
+                    className="text-sm text-gray-700 dark:text-gray-300"
+                  >
+                    Name
+                  </Label>
+                  <Input
+                    id="playlist-name"
+                    type="text"
+                    value={newPlaylistName}
+                    onChange={(e) => setNewPlaylistName(e.target.value)}
+                    placeholder="My Awesome Playlist"
+                    className="w-full border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label
+                    htmlFor="playlist-description"
+                    className="text-sm text-gray-700 dark:text-gray-300"
+                  >
+                    Description (Optional)
+                  </Label>
+                  <Input
+                    id="playlist-description"
+                    type="text"
+                    value={newPlaylistDescription}
+                    onChange={(e) => setNewPlaylistDescription(e.target.value)}
+                    placeholder="A collection of my favorite videos"
+                    className="w-full border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
               <div className="flex justify-end gap-2 mt-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => setShowCreateForm(false)}
-                  className="text-gray-700 dark:text-gray-300"
+                  className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                   Cancel
                 </Button>
-                <Button 
+                <Button
                   className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-                  disabled={!newPlaylistName.trim()}
+                  disabled={
+                    !newPlaylistName.trim() || createPlaylistMutation.isPending
+                  }
+                  onClick={handleCreatePlaylist}
                 >
-                  Create
+                  {createPlaylistMutation.isPending ? "Creating..." : "Create"}
                 </Button>
               </div>
             </div>
@@ -155,14 +258,16 @@ export default function AddToPlaylistModal({ isOpen, onClose, videoId }: AddToPl
           <Button
             onClick={onClose}
             variant="outline"
-            className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
+            className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             Cancel
           </Button>
           <Button
             onClick={handleAddToPlaylists}
             className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-            disabled={selectedPlaylists.length === 0 || addToPlaylistMutation.isPending}
+            disabled={
+              selectedPlaylists.length === 0 || addToPlaylistMutation.isPending
+            }
           >
             {addToPlaylistMutation.isPending ? "Saving..." : "Save"}
           </Button>

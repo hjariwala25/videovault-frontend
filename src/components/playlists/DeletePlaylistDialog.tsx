@@ -1,5 +1,14 @@
 import { useDeletePlaylist } from "@/hooks/usePlaylistQueries";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -10,11 +19,11 @@ interface DeletePlaylistDialogProps {
   playlistName: string;
 }
 
-export default function DeletePlaylistDialog({ 
-  isOpen, 
-  onClose, 
-  playlistId, 
-  playlistName 
+export default function DeletePlaylistDialog({
+  isOpen,
+  onClose,
+  playlistId,
+  playlistName,
 }: DeletePlaylistDialogProps) {
   const deletePlaylistMutation = useDeletePlaylist();
   const router = useRouter();
@@ -34,20 +43,26 @@ export default function DeletePlaylistDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+      <AlertDialogContent className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-xl font-bold text-gray-900 dark:text-white">Delete Playlist</AlertDialogTitle>
+          <AlertDialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+            Delete Playlist
+          </AlertDialogTitle>
           <AlertDialogDescription className="text-gray-600 dark:text-gray-400">
-            Are you sure you want to delete <span className="font-medium text-gray-800 dark:text-gray-200">&quot;{playlistName}&quot;</span>? This action cannot be undone.
+            Are you sure you want to delete{" "}
+            <span className="font-medium text-gray-800 dark:text-gray-200">
+              &quot;{playlistName}&quot;
+            </span>
+            ? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300">
+          <AlertDialogCancel className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white"
             disabled={deletePlaylistMutation.isPending}
           >
             {deletePlaylistMutation.isPending ? "Deleting..." : "Delete"}
