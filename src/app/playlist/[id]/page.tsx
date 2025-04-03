@@ -55,29 +55,22 @@ export default function PlaylistPage() {
     console.log("Raw playlist data:", playlist);
 
     try {
-      // The API response has a very specific structure:
-      // playlist.playlistVideos[0].videos contains the fully populated video objects
-
       if (
         playlist.playlistVideos &&
         Array.isArray(playlist.playlistVideos) &&
         playlist.playlistVideos.length > 0 &&
         playlist.playlistVideos[0].videos
       ) {
-        // These are the complete video objects with all details including thumbnails
         const completeVideos = playlist.playlistVideos[0].videos;
 
-        // Mark these videos as already saved in this playlist
         const markedVideos = completeVideos.map((video: Video) => ({
           ...video,
           isInPlaylist: true,
           playlistId: playlistId,
         }));
 
-        // Use the complete video objects directly
         setProcessedVideos(markedVideos);
 
-        // Also set videoIds for any additional processing if needed
         const ids = completeVideos.map((video: Video) => video._id);
         setVideoIds(ids);
       } else {
@@ -119,10 +112,8 @@ export default function PlaylistPage() {
 
     console.log("Video details received:", videoDetails);
 
-    // Make a fresh copy of processed videos to avoid dependency loop
     const currentVideos = [...processedVideos];
 
-    // Create a map of video objects by ID for faster lookups
     const videoMap: { [key: string]: Video } = {};
 
     // Handle both array and object responses
