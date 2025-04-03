@@ -158,19 +158,22 @@ export default function PlaylistPage() {
     toast.promise(
       // Return the promise chain
       async () => {
-        const result = await removeVideoMutation.mutateAsync({ playlistId, videoId });
-        
+        const result = await removeVideoMutation.mutateAsync({
+          playlistId,
+          videoId,
+        });
+
         // Optimistically update the UI
         setProcessedVideos((prev) =>
           prev.filter((video) => video._id !== videoId)
         );
-        
+
         return result;
       },
       {
         loading: "Removing video...",
         success: "Video removed from playlist",
-        error: "Failed to remove video"
+        error: "Failed to remove video",
       }
     );
   };
@@ -245,7 +248,6 @@ export default function PlaylistPage() {
       ? processedVideos[0].thumbnail
       : "/default-thumbnail.png";
 
-  // Add this calculation just before your return statement
   const totalViews = processedVideos.reduce(
     (sum, video) => sum + (video.views || 0),
     0
@@ -283,9 +285,7 @@ export default function PlaylistPage() {
                 <div className="flex flex-wrap gap-4 text-sm text-gray-300">
                   <div className="flex items-center">
                     <ListVideo className="w-4 h-4 mr-1.5" />
-                    <span>
-                    {processedVideos.length || videoIds.length}
-                    </span>
+                    <span>{processedVideos.length || videoIds.length}</span>
                   </div>
                   <div className="flex items-center">
                     <Eye className="w-4 h-4 mr-1.5" />

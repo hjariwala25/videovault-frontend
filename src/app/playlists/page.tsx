@@ -23,9 +23,9 @@ export default function Playlists() {
   const [isClient, setIsClient] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Add this effect to periodically refetch playlists
+
   useEffect(() => {
-    // Don't run if no user is logged in
+  
     if (!currentUser?._id) return;
 
     // Refetch immediately when component mounts
@@ -40,7 +40,7 @@ export default function Playlists() {
     return () => clearInterval(intervalId);
   }, [currentUser?._id, refetch]);
 
-  // Also add event listener for visibility changes
+  
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
