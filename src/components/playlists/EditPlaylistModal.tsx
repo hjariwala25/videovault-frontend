@@ -19,45 +19,109 @@ interface EditPlaylistModalProps {
   isOpen: boolean;
   onClose: () => void;
   playlist: Playlist | null;
+  onSuccess?: () => void;
 }
 
 export default function EditPlaylistModal({
   isOpen,
   onClose,
   playlist,
+  onSuccess,
 }: EditPlaylistModalProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const updatePlaylistMutation = useUpdatePlaylist();
+  const [playlistId, setPlaylistId] = useState<string | null>(null);
 
+  // Reset form data when modal opens or playlist changes
   useEffect(() => {
     if (playlist) {
+      console.log("Playlist received in modal:", playlist);
+
+      let id = null;
+
+      if (playlist._id) {
+        id = playlist._id;
+        console.log("Found ID directly:", id);
+      } //  else if (playlist.playlistVideos && playlist.playlistVideos[0]?._id) {
+      //   id = playlist.playlistVideos[0]._id;
+      //   console.log("Found ID in nested structure:", id);
+      // }
+
+      // Set the ID
+      setPlaylistId(id);
+
+      // Set form values with reasonable defaults
       setName(playlist.name || "");
       setDescription(playlist.description || "");
+
+      // Log current form values for debugging
+      console.log("Set form values:", {
+        id,
+        name: playlist.name || "",
+        description: playlist.description || "",
+      });
     }
-  }, [playlist]);
+  }, [playlist, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!playlist?._id || !name.trim()) {
+
+    if (!playlist) {
+      toast.error("No playlist selected. Please try again.");
+      return;
+    }
+
+    const urlId = window.location.pathname.split("/").pop();
+
+    const idToUse = playlistId || playlist._id || urlId;
+
+    if (!idToUse) {
+      console.error("Missing playlist ID:", { playlist, playlistId, urlId });
+      toast.error("Cannot identify playlist. Please refresh and try again.");
+      return;
+    }
+
+    if (!name.trim()) {
       toast.error("Playlist name is required");
       return;
     }
 
-    try {
-      await updatePlaylistMutation.mutateAsync({
-        playlistId: playlist._id,
-        name,
-        description,
-      });
-      toast.success("Playlist updated successfully");
-      onClose();
-    } catch (error) {
-      toast.error("Failed to update playlist");
-      console.error(error);
-    }
+
+  
+    let successCalled = false;
+
+    // Use toast.promise to avoid stuck loading states
+    toast.promise(
+      updatePlaylistMutation
+        .mutateAsync({
+          playlistId: idToUse,
+          name: name.trim(),
+          description: description.trim(),
+        })
+        .then((result) => {
+          // Flag to prevent double execution
+          if (!successCalled) {
+            successCalled = true;
+
+
+        
+            if (onSuccess) onSuccess();
+
+            // Close the modal
+            onClose();
+          }
+          return result;
+        }),
+      {
+        loading: "Updating playlist...",
+        success: "Playlist updated successfully",
+        error: "Failed to update playlist",
+      }
+    );
   };
 
+  // Guard clause if no playlist
   if (!playlist) return null;
 
   return (

@@ -23,7 +23,7 @@ interface AddToPlaylistModalProps {
   isOpen: boolean;
   onClose: () => void;
   videoId: string;
-  currentPlaylistId?: string; 
+  currentPlaylistId?: string;
 }
 
 export default function AddToPlaylistModal({
@@ -68,24 +68,26 @@ export default function AddToPlaylistModal({
       return;
     }
 
-    try {
-      // Add to all selected playlists
-      await Promise.all(
+    toast.promise(
+      Promise.all(
         selectedPlaylists.map((playlistId) =>
           addToPlaylistMutation.mutateAsync({ playlistId, videoId })
         )
-      );
-
-      toast.success(
-        `Added to ${selectedPlaylists.length} playlist${
-          selectedPlaylists.length > 1 ? "s" : ""
-        }`
-      );
-      onClose();
-    } catch (error) {
-      toast.error("Failed to add to playlist");
-      console.error(error);
-    }
+      ),
+      {
+        loading: "Adding to playlists...",
+        success: () => {
+          onClose();
+          return `Added to ${selectedPlaylists.length} playlist${
+            selectedPlaylists.length > 1 ? "s" : ""
+          }`;
+        },
+        error: (err) => {
+          console.error(err);
+          return "Failed to add to playlist";
+        },
+      }
+    );
   };
 
   const handleCreatePlaylist = async () => {
@@ -94,27 +96,33 @@ export default function AddToPlaylistModal({
       return;
     }
 
-    try {
-      const result = await createPlaylistMutation.mutateAsync({
+    toast.promise(
+      createPlaylistMutation.mutateAsync({
         name: newPlaylistName,
         description: newPlaylistDescription,
-      });
+      }),
+      {
+        loading: "Creating playlist...",
+        success: (result) => {
+          if (result?.data?._id) {
+            setSelectedPlaylists([...selectedPlaylists, result.data._id]);
+          }
 
-      if (result?.data?._id) {
-        setSelectedPlaylists([...selectedPlaylists, result.data._id]);
+          setShowCreateForm(false);
+          setNewPlaylistName("");
+          setNewPlaylistDescription("");
+
+          // Refresh playlists
+          refetch();
+
+          return "Playlist created successfully";
+        },
+        error: (err) => {
+          console.error(err);
+          return "Failed to create playlist";
+        },
       }
-
-      toast.success("Playlist created successfully");
-      setShowCreateForm(false);
-      setNewPlaylistName("");
-      setNewPlaylistDescription("");
-
-      // Refresh playlists
-      refetch();
-    } catch (error) {
-      toast.error("Failed to create playlist");
-      console.error(error);
-    }
+    );
   };
 
   return (

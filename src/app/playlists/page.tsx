@@ -9,6 +9,8 @@ import { PlusCircle, FolderPlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import CreatePlaylistModal from "@/components/playlists/CreatePlaylistModal";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 export default function Playlists() {
   const { data: currentUser } = useCurrentUser();
@@ -16,6 +18,7 @@ export default function Playlists() {
     data: playlists,
     isLoading,
     error,
+    refetch,
   } = useUserPlaylists(currentUser?._id || "");
   const [isClient, setIsClient] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -29,8 +32,34 @@ export default function Playlists() {
   if (isLoading)
     return (
       <MainLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="w-12 h-12 border-4 border-blue-200 dark:border-blue-900 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin"></div>
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-10 w-40" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array(3)
+              .fill(0)
+              .map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm"
+                >
+                  <Skeleton className="w-full aspect-video" />
+                  <div className="p-4">
+                    <Skeleton className="h-6 w-2/3 mb-2" />
+                    <Skeleton className="h-4 w-full mb-1" />
+                    <Skeleton className="h-4 w-4/5 mb-3" />
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-3 w-16" />
+                      <Skeleton className="h-3 w-3 rounded-full" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
         </div>
       </MainLayout>
     );
@@ -43,7 +72,10 @@ export default function Playlists() {
             Error loading playlists: {error.message}
           </p>
           <Button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              toast.loading("Retrying...");
+              refetch().then(() => toast.success("Refreshed!"));
+            }}
             className="mt-4 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600"
           >
             Retry
@@ -51,6 +83,11 @@ export default function Playlists() {
         </div>
       </MainLayout>
     );
+
+  const handlePlaylistCreated = () => {
+    toast.success("Playlist created successfully!");
+    refetch();
+  };
 
   return (
     <MainLayout>
@@ -98,6 +135,7 @@ export default function Playlists() {
       <CreatePlaylistModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
+        onSuccess={handlePlaylistCreated}
       />
     </MainLayout>
   );

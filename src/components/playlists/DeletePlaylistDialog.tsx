@@ -29,12 +29,16 @@ export default function DeletePlaylistDialog({
   const router = useRouter();
 
   const handleDelete = async () => {
+    const loadingToastId = toast.loading("Deleting playlist...");
+
     try {
       await deletePlaylistMutation.mutateAsync(playlistId);
+      toast.dismiss(loadingToastId);
       toast.success("Playlist deleted successfully");
       onClose();
       router.push("/playlists");
     } catch (error) {
+      toast.dismiss(loadingToastId);
       toast.error("Failed to delete playlist");
       console.error(error);
       onClose();

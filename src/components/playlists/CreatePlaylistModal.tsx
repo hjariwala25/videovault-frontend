@@ -36,17 +36,28 @@ export default function CreatePlaylistModal({
       return;
     }
 
-    try {
-      await createPlaylistMutation.mutateAsync({ name, description });
-      toast.success("Playlist created successfully");
-      setName("");
-      setDescription("");
-      onClose();
-      if (onSuccess) onSuccess();
-    } catch (error) {
-      toast.error("Failed to create playlist");
-      console.error(error);
-    }
+    // Create a state tracking variable
+    let hasExecuted = false;
+
+    toast.promise(
+      createPlaylistMutation
+        .mutateAsync({ name, description })
+        .then((result) => {
+          // Flag to prevent double execution
+          if (!hasExecuted) {
+            hasExecuted = true;
+            setName("");
+            setDescription("");
+            if (onSuccess) onSuccess();
+          }
+          return result;
+        }),
+      {
+        loading: "Creating playlist...",
+        success: "Playlist created successfully",
+        error: "Failed to create playlist",
+      }
+    );
   };
 
   return (
