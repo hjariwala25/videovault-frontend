@@ -5,7 +5,7 @@ import { useUserPlaylists } from "@/hooks/usePlaylistQueries";
 import PlaylistCard from "@/components/common/PlaylistCard";
 import MainLayout from "@/components/layout/MainLayout";
 import { Playlist } from "@/types";
-import { PlusCircle, FolderPlus } from "lucide-react";
+import { PlusCircle, FolderPlus, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import CreatePlaylistModal from "@/components/playlists/CreatePlaylistModal";
@@ -22,6 +22,37 @@ export default function Playlists() {
   } = useUserPlaylists(currentUser?._id || "");
   const [isClient, setIsClient] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Add this effect to periodically refetch playlists
+  useEffect(() => {
+    // Don't run if no user is logged in
+    if (!currentUser?._id) return;
+
+    // Refetch immediately when component mounts
+    refetch();
+
+    // Set up interval to refetch playlists every 10 seconds
+    const intervalId = setInterval(() => {
+      refetch(); // Refetch playlists
+    }, 10000);
+
+    // Clean up interval on unmount
+    return () => clearInterval(intervalId);
+  }, [currentUser?._id, refetch]);
+
+  // Also add event listener for visibility changes
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        refetch(); // Refetch when tab becomes visible again
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [refetch]);
 
   useEffect(() => {
     setIsClient(true);
@@ -96,12 +127,29 @@ export default function Playlists() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Your Playlists
           </h1>
-          <Button
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-sm hover:shadow transition-all"
-            onClick={() => setShowCreateModal(true)}
-          >
-            <PlusCircle className="mr-2 h-4 w-4" /> Create Playlist
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-sm hover:shadow transition-all"
+              onClick={() => setShowCreateModal(true)}
+            >
+              <PlusCircle className="mr-2 h-4 w-4" /> Create Playlist
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                toast.promise(refetch(), {
+                  loading: "Refreshing...",
+                  success: "Playlists updated",
+                  error: "Failed to refresh",
+                });
+              }}
+              className="h-10 w-10 border-gray-200 dark:border-gray-800"
+              title="Refresh playlists"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         {playlists && playlists.length > 0 ? (
@@ -134,7 +182,10 @@ export default function Playlists() {
 
       <CreatePlaylistModal
         isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+        onClose={() => {
+          setShowCreateModal(false);
+          refetch();
+        }}
         onSuccess={handlePlaylistCreated}
       />
     </MainLayout>

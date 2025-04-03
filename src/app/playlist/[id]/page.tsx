@@ -155,21 +155,24 @@ export default function PlaylistPage() {
   }, [videoDetails]);
 
   const handleRemoveVideo = async (videoId: string) => {
-    toast.loading("Removing video...");
-
-    try {
-      await removeVideoMutation.mutateAsync({ playlistId, videoId });
-
-      // Optimistically update the UI
-      setProcessedVideos((prev) =>
-        prev.filter((video) => video._id !== videoId)
-      );
-
-      toast.success("Video removed from playlist");
-    } catch (error) {
-      toast.error("Failed to remove video");
-      console.error(error);
-    }
+    toast.promise(
+      // Return the promise chain
+      async () => {
+        const result = await removeVideoMutation.mutateAsync({ playlistId, videoId });
+        
+        // Optimistically update the UI
+        setProcessedVideos((prev) =>
+          prev.filter((video) => video._id !== videoId)
+        );
+        
+        return result;
+      },
+      {
+        loading: "Removing video...",
+        success: "Video removed from playlist",
+        error: "Failed to remove video"
+      }
+    );
   };
 
   if (isLoading)
@@ -281,11 +284,7 @@ export default function PlaylistPage() {
                   <div className="flex items-center">
                     <ListVideo className="w-4 h-4 mr-1.5" />
                     <span>
-                      {processedVideos.length ||
-                        playlist?.playlist?.videos?.length ||
-                        playlist?.videos?.length ||
-                        0}{" "}
-                      videos
+                    {processedVideos.length || videoIds.length}
                     </span>
                   </div>
                   <div className="flex items-center">
