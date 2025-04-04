@@ -5,7 +5,8 @@ import VideoCard from "@/components/common/VideoCard";
 import MainLayout from "@/components/layout/MainLayout";
 import { useState, useEffect } from "react";
 import { Video } from "@/types";
-import Link from "next/link"; 
+import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function History() {
   const { data: historyData, isLoading, error } = useWatchHistory();
@@ -27,7 +28,32 @@ export default function History() {
   if (isLoading)
     return (
       <MainLayout>
-        <div className="text-center p-4">Loading history...</div>
+        <div className="p-4">
+          <Skeleton className="h-8 w-48 mb-6" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array(4)
+              .fill(0)
+              .map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm"
+                >
+                  <Skeleton className="w-full aspect-video" />
+                  <div className="p-4">
+                    <Skeleton className="h-5 w-full mb-2" />
+                    <div className="flex items-center mt-2">
+                      <Skeleton className="h-8 w-8 rounded-full mr-2" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                    <div className="flex items-center justify-between mt-2 text-xs">
+                      <Skeleton className="h-3 w-16" />
+                      <Skeleton className="h-3 w-28" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
       </MainLayout>
     );
 

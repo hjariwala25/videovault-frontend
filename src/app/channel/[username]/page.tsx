@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { MessageSquare, Film, UserCheck, UserPlus } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Video } from "@/types";
 
 // Define tab types for type safety
 type TabType = "videos" | "tweets";
@@ -40,9 +42,55 @@ export default function Channel() {
   if (!isClient) return null;
   if (isLoading)
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-12 h-12 border-4 border-blue-200 dark:border-blue-900 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin"></div>
-      </div>
+      <MainLayout>
+        <div>
+          {/* Channel header */}
+          <div className="bg-gray-100 dark:bg-gray-900 h-32 relative">
+            <div className="absolute -bottom-12 left-6">
+              <Skeleton className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800" />
+            </div>
+          </div>
+
+          <div className="mt-16 px-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <Skeleton className="h-7 w-48 mb-2" />
+                <Skeleton className="h-4 w-32 mb-1" />
+                <Skeleton className="h-4 w-20" />
+              </div>
+              <Skeleton className="h-10 w-28 rounded-md" />
+            </div>
+
+            <div className="mt-8">
+              <div className="flex gap-2 border-b border-gray-200 dark:border-gray-800 mb-6">
+                <Skeleton className="h-10 w-20" />
+                <Skeleton className="h-10 w-24" />
+                <Skeleton className="h-10 w-20" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array(6)
+                  .fill(0)
+                  .map((_, i) => (
+                    <div
+                      key={i}
+                      className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm"
+                    >
+                      <Skeleton className="w-full aspect-video" />
+                      <div className="p-4">
+                        <Skeleton className="h-5 w-full mb-2" />
+                        <div className="flex items-center justify-between mt-2 text-xs">
+                          <Skeleton className="h-3 w-16" />
+                          <Skeleton className="h-3 w-12" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </MainLayout>
     );
 
   if (error)
@@ -182,7 +230,7 @@ export default function Channel() {
               </h2>
               {videos.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {videos.map((video: any) => (
+                  {videos.map((video: Video) => (
                     <VideoCard key={video._id} video={video} />
                   ))}
                 </div>
@@ -207,40 +255,46 @@ export default function Channel() {
               </h2>
               {tweets?.length > 0 ? (
                 <div className="space-y-4">
-                  {tweets.map((tweet: any) => (
-                    <div
-                      key={tweet._id}
-                      className="p-4 bg-white dark:bg-black/40 rounded-xl border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow duration-200"
-                    >
-                      <div className="flex items-center mb-3">
-                        <Image
-                          src={channel?.avatar || "/default-avatar.png"}
-                          alt={channel?.username || ""}
-                          width={36}
-                          height={36}
-                          className="rounded-full mr-3"
-                        />
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">
-                            {channel?.fullname}
-                          </div>
-                          <div className="text-gray-500 dark:text-gray-400 text-xs">
-                            {new Date(tweet.createdAt).toLocaleDateString(
-                              undefined,
-                              {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                              }
-                            )}
+                  {tweets.map(
+                    (tweet: {
+                      _id: string;
+                      content: string;
+                      createdAt: string;
+                    }) => (
+                      <div
+                        key={tweet._id}
+                        className="p-4 bg-white dark:bg-black/40 rounded-xl border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow duration-200"
+                      >
+                        <div className="flex items-center mb-3">
+                          <Image
+                            src={channel?.avatar || "/default-avatar.png"}
+                            alt={channel?.username || ""}
+                            width={36}
+                            height={36}
+                            className="rounded-full mr-3"
+                          />
+                          <div>
+                            <div className="font-medium text-gray-900 dark:text-white">
+                              {channel?.fullname}
+                            </div>
+                            <div className="text-gray-500 dark:text-gray-400 text-xs">
+                              {new Date(tweet.createdAt).toLocaleDateString(
+                                undefined,
+                                {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                }
+                              )}
+                            </div>
                           </div>
                         </div>
+                        <p className="text-gray-800 dark:text-gray-200 whitespace-pre-line">
+                          {tweet.content}
+                        </p>
                       </div>
-                      <p className="text-gray-800 dark:text-gray-200 whitespace-pre-line">
-                        {tweet.content}
-                      </p>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               ) : (
                 <div className="bg-white dark:bg-black/40 border border-gray-100 dark:border-gray-800 rounded-xl p-8 text-center">

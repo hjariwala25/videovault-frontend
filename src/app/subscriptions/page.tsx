@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Subscriptions() {
   const { data: currentUser, isLoading: userLoading } = useCurrentUser();
@@ -19,7 +20,7 @@ export default function Subscriptions() {
   } = useSubscribedChannels(currentUser?._id || "");
   const [isClient, setIsClient] = useState(false);
 
-  // Extract the actual subscription data 
+  // Extract the actual subscription data
   const subscriptions = Array.isArray(subscriptionsData)
     ? subscriptionsData
     : subscriptionsData?.data || [];
@@ -30,8 +31,6 @@ export default function Subscriptions() {
       console.log("Raw subscription data:", subscriptionsData);
     }
   }, [subscriptionsData]);
-
-  // Wait for user to load before showing anything
   useEffect(() => {
     if (currentUser?._id) {
       refetch();
@@ -42,11 +41,43 @@ export default function Subscriptions() {
 
   const isLoading = userLoading || subscriptionsLoading;
 
+  //Skeleton loading state
   if (isLoading)
     return (
       <MainLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="w-12 h-12 border-4 border-blue-200 dark:border-blue-900 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin"></div>
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          {/* Page title skeleton */}
+          <Skeleton className="h-8 w-64 mb-6" />
+
+          {/* Subscription cards grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array(6)
+              .fill(0)
+              .map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl bg-white dark:bg-black/40 p-0.5 shadow-lg"
+                >
+                  <div className="rounded-[10px] bg-white dark:bg-black/40 p-5">
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                      {/* Avatar skeleton */}
+                      <div className="relative">
+                        <Skeleton className="w-[80px] h-[80px] rounded-full" />
+                      </div>
+
+                      {/* Channel details skeleton */}
+                      <div className="flex-1 text-center sm:text-left">
+                        <Skeleton className="h-6 w-36 mb-2 mx-auto sm:mx-0" />
+                        <Skeleton className="h-4 w-24 mb-2 mx-auto sm:mx-0" />
+                        <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-2">
+                          <Skeleton className="h-5 w-24 rounded-full" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
         </div>
       </MainLayout>
     );
@@ -89,10 +120,9 @@ export default function Subscriptions() {
                 },
                 index: number
               ) => {
-                // Get the subscribedChannel data directly
+                // get subscribed channel data
                 const channelData = sub.subscribedChannel || {};
 
-                // Safely extract fields with fallbacks
                 const username = channelData.username || "";
                 const fullname =
                   channelData.fullname || username || "Unknown Channel";
