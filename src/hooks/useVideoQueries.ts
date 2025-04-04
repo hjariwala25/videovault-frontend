@@ -33,20 +33,19 @@ export function useVideosByIds(videoIds: string[]) {
     queryFn: async () => {
       if (!videoIds.length) return [];
 
-      // Try to fetch each video individually since the batch endpoint may not be working
       console.log("Fetching individual videos for IDs:", videoIds);
       const videos = [];
 
       for (const id of videoIds) {
         try {
-          // Use the same endpoint pattern as useVideoById
+        
           const response = await api.get(`/video/v/${id}`);
           console.log(`Fetched video ${id}:`, response.data);
 
           if (response.data.data) {
             videos.push(response.data.data);
           } else if (response.data) {
-            // Handle case where data might not be nested under .data
+            // If the response doesn't have 'data', but has the video object directly
             videos.push(response.data);
           }
         } catch (error) {
@@ -67,12 +66,18 @@ export function useUploadVideo() {
 
   return useMutation({
     mutationFn: async (formData: FormData) => {
-      const response = await api.post("/video/videos", formData);
-      return response.data.data;
+      const response = await api.post("/video/videos", formData, {
+        headers: {
+          // Let axios set the content type automatically
+        },
+      });
+      return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.videos.all });
+      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.videos() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.videos.all });
     },
   });
 }
@@ -82,14 +87,21 @@ export function useUpdateVideo(videoId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: FormData) => {
-      const response = await api.patch(`/video/v/${videoId}`, data);
-      return response.data.data;
+    mutationFn: async (formData: FormData) => {
+      const response = await api.patch(`/video/v/${videoId}`, formData, {
+        headers: {
+          // Let axios set the content type automatically
+        },
+      });
+      return response.data;
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(queryKeys.videos.detail(videoId), data);
-      queryClient.invalidateQueries({ queryKey: queryKeys.videos.all });
+    onSuccess: () => {
+      // Invalidate relevant queries
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.videos.detail(videoId),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.videos() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.videos.all });
     },
   });
 }
@@ -100,13 +112,14 @@ export function useDeleteVideo() {
 
   return useMutation({
     mutationFn: async (videoId: string) => {
-      await api.delete(`/video/v/${videoId}`);
-      return videoId;
+      const response = await api.delete(`/video/videos/${videoId}`);
+      return response.data;
     },
-    onSuccess: (videoId) => {
-      queryClient.removeQueries({ queryKey: queryKeys.videos.detail(videoId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.videos.all });
+    onSuccess: () => {
+      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.videos() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.videos.all });
     },
   });
 }
@@ -118,12 +131,15 @@ export function useTogglePublishStatus() {
   return useMutation({
     mutationFn: async (videoId: string) => {
       const response = await api.patch(`/video/toggle/publish/${videoId}`);
-      return response.data.data;
+      return response.data;
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(queryKeys.videos.detail(data._id), data);
-      queryClient.invalidateQueries({ queryKey: queryKeys.videos.all });
+    onSuccess: (data, videoId) => {
+      // Invalidate relevant queries
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.videos.detail(videoId),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.videos() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.videos.all });
     },
   });
 }

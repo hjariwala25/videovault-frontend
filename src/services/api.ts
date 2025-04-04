@@ -7,7 +7,6 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    // Let axios set content-type automatically for FormData
     if (config.data instanceof FormData) {
       // Remove content-type to let browser set it with correct boundary
       delete config.headers['Content-Type'];

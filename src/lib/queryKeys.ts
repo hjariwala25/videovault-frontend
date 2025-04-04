@@ -51,8 +51,9 @@ export const queryKeys = {
 
   // Dashboard related keys
   dashboard: {
-    all: ["dashboard"] as const,
-    stats: () => [...queryKeys.dashboard.all, "stats"] as const,
-    videos: () => ["dashboard", "videos"] as const,
+    all: ["dashboard"],
+    stats: () => [...queryKeys.dashboard.all, "stats"],
+    videos: () => [...queryKeys.dashboard.all, "videos"],
+    analytics: (period: string) => [...queryKeys.dashboard.all, "analytics", period],
   },
 };
