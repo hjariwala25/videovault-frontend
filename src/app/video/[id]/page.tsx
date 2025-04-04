@@ -5,6 +5,7 @@ import { useVideoById } from "@/hooks/useVideoQueries";
 import { useToggleVideoLike } from "@/hooks/useLikeQueries";
 import { useVideoComments, useAddComment } from "@/hooks/useCommentQueries";
 import { useCurrentUser } from "@/hooks/useUserQueries";
+import { useToggleSubscription } from "@/hooks/useSubscriptionQueries"; // Add this import
 import Comment from "@/components/common/Comment";
 import CommentForm from "@/components/common/CommentForm";
 import MainLayout from "@/components/layout/MainLayout";
@@ -13,7 +14,7 @@ import { useState, useEffect } from "react";
 import { Comment as CommentType } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, UserCheck, UserPlus } from "lucide-react"; // Add UserCheck and UserPlus
 import { formatTimeAgo, formatCount } from "@/utils/formatTime";
 import VideoActions from "@/components/video/VideoActions";
 import { useUserPlaylists } from "@/hooks/usePlaylistQueries";
@@ -29,7 +30,7 @@ export default function VideoPage() {
   const toggleLike = useToggleVideoLike();
   const addComment = useAddComment();
   const [isClient, setIsClient] = useState(false);
-
+  const toggleSubscription = useToggleSubscription();
 
   const [playlistChangeCounter, setPlaylistChangeCounter] = useState(0);
 
@@ -51,7 +52,7 @@ export default function VideoPage() {
 
     // Check all playlists for this video
     for (const playlist of userPlaylists) {
-      // Check if videos array exists and contains this video
+    
       if (playlist.videos && Array.isArray(playlist.videos)) {
         const flattenedIds = playlist.videos.flat();
         if (flattenedIds.includes(videoId)) {
@@ -63,7 +64,7 @@ export default function VideoPage() {
     }
 
     console.log("Checked if video is in playlist:", isInPlaylist, playlistId);
-  }, [userPlaylists, videoId, playlistChangeCounter]); // Add playlistChangeCounter to dependencies
+  }, [userPlaylists, videoId, playlistChangeCounter]); 
 
   useEffect(() => {
     setIsClient(true);
@@ -168,7 +169,6 @@ export default function VideoPage() {
           </Button>
         </div>
 
-      
         <div className="flex items-center mt-2 text-sm text-gray-600 dark:text-gray-300">
           <div className="flex items-center gap-3">
             <span>{formatCount(video.views || 0)} views</span>
@@ -177,8 +177,15 @@ export default function VideoPage() {
           </div>
         </div>
 
+        {/* Video description - MOVED UP */}
+        <div className="bg-gray-50 dark:bg-black/40 p-4 rounded-lg my-6">
+          <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
+            {video.description}
+          </p>
+        </div>
+
         {/* Creator profile section */}
-        <div className="flex items-center mt-6 mb-6 pb-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-800">
           {owner ? (
             <Link
               href={`/channel/${owner.username}`}
@@ -202,11 +209,11 @@ export default function VideoPage() {
                   @{owner.username}
                 </p>
                 {/* Subscriber count  */}
-                {/* {owner.subscribersCount !== undefined && (
+                {owner.subscribersCount !== undefined && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {formatCount(owner.subscribersCount)} subscribers
                   </p>
-                )} */}
+                )}
               </div>
             </Link>
           ) : (
@@ -240,19 +247,44 @@ export default function VideoPage() {
             <Button
               variant="outline"
               className="ml-auto border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/40 hover:text-blue-600 dark:hover:text-blue-400"
-              // Replace with your subscription mutation
-              // onClick={() => subscribeToChannel.mutate(owner._id)}
+              onClick={() => {
+                if (owner?._id) {
+                  // Store current subscription state to reference in onSuccess
+                  const wasSubscribed = owner.isSubscribed;
+
+                  toggleSubscription.mutate(owner._id, {
+                    onSuccess: () => {
+                      owner.isSubscribed = !wasSubscribed;
+
+                      toast.success(
+                        wasSubscribed
+                          ? "Unsubscribed successfully"
+                          : "Subscribed successfully"
+                      );
+                    },
+                    onError: () => {
+                      toast.error("Failed to update subscription");
+                    },
+                  });
+                }
+              }}
+              disabled={toggleSubscription.isPending}
             >
-              {owner.isSubscribed ? "Unsubscribe" : "Subscribe"}
+              {toggleSubscription.isPending ? (
+                <div className="h-4 w-4 border-2 border-gray-600 dark:border-gray-200 border-t-transparent rounded-full animate-spin mr-2"></div>
+              ) : owner.isSubscribed ? (
+                <>
+                  <UserCheck className="mr-1.5 h-4 w-4" />
+                  Unsubscribe
+                </>
+              ) : (
+                <>
+                  <UserPlus className="mr-1.5 h-4 w-4" />
+                  Subscribe
+                </>
+              )}
             </Button>
           )}
-        </div>
-
-        {/* Video description */}
-        <div className="bg-gray-50 dark:bg-black/40 p-4 rounded-lg mb-6">
-          <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
-            {video.description}
-          </p>
         </div>
 
         <VideoActions
