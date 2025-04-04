@@ -3,16 +3,46 @@
 import { useVideos } from "@/hooks/useVideoQueries";
 import VideoCard from "@/components/common/VideoCard";
 import MainLayout from "@/components/layout/MainLayout";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Video } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
 
 export default function Home() {
-  const { data, isLoading, error } = useVideos();
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useVideos();
   const [isClient, setIsClient] = useState(false);
 
-  // Get videos array from the paginated response
-  const videos = data?.videos || [];
+  // Create a ref for our loading element
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  // Flatten all videos from all pages
+  const videos = data?.pages.flatMap((page) => page.videos || []) || [];
+
+  // Set up the intersection observer to load more videos when scrolling
+  const lastElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading || isFetchingNextPage) return;
+
+      if (observerRef.current) observerRef.current.disconnect();
+
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      });
+
+      if (node) observerRef.current.observe(node);
+    },
+    [isLoading, isFetchingNextPage, hasNextPage, fetchNextPage]
+  );
 
   useEffect(() => {
     setIsClient(true);
@@ -23,7 +53,7 @@ export default function Home() {
 
   if (!isClient) return null;
 
-  if (isLoading)
+  if (isLoading && !data)
     return (
       <MainLayout>
         <div className="p-4">
@@ -59,7 +89,7 @@ export default function Home() {
     return (
       <MainLayout>
         <div className="text-center p-4 text-red-500">
-          Error: {error.message}
+          Error: {(error as Error).message}
         </div>
       </MainLayout>
     );
@@ -67,16 +97,43 @@ export default function Home() {
   return (
     <MainLayout>
       <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Videos</h1>
+        <h1 className="text-2xl font-bold mb-4 text-adaptive-heading">
+          Videos
+        </h1>
         {videos.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos.map((video: Video) => (
-              <VideoCard key={video._id} video={video} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {videos.map((video: Video, index: number) => (
+                <VideoCard
+                  key={video._id}
+                  video={video}
+                  ref={index === videos.length - 3 ? lastElementRef : undefined}
+                />
+              ))}
+            </div>
+
+            {/* Loading indicator */}
+            <div
+              ref={loadMoreRef}
+              className="flex justify-center items-center py-8"
+            >
+              {isFetchingNextPage && (
+                <div className="flex items-center justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin mr-2 text-blue-500" />
+                  <span className="text-adaptive-muted">
+                    Loading more videos...
+                  </span>
+                </div>
+              )}
+
+              {!hasNextPage && videos.length > 0 && (
+                <p className="text-adaptive-muted">No more videos to load</p>
+              )}
+            </div>
+          </>
         ) : (
           <div className="text-center py-8">
-            <p>No videos found</p>
+            <p className="text-adaptive-muted">No videos found</p>
           </div>
         )}
       </div>

@@ -1,16 +1,40 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import api from "@/services/api";
 import { queryKeys } from "@/lib/queryKeys";
 // import { Video } from '@/types';
 
 // Get videos with optional filtering
 export function useVideos(params = {}) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: queryKeys.videos.list(params),
-    queryFn: async () => {
-      const response = await api.get("/video/videos", { params });
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await api.get("/video/videos", {
+        params: {
+          ...params,
+          page: pageParam,
+          limit: 10, // Match your API's default limit
+        },
+      });
+      console.log(`Fetched page ${pageParam}:`, response.data);
       return response.data.data;
     },
+    getNextPageParam: (lastPage) => {
+      // The API returns page, limit, and totalVideos - not currentPage/totalPages
+      const { page, limit, totalVideos } = lastPage;
+
+      // Calculate if there are more pages
+      const totalPages = Math.ceil(totalVideos / limit);
+      console.log(`Current page: ${page}, Total pages: ${totalPages}`);
+
+      // Return the next page number or undefined if we're on the last page
+      return page < totalPages ? page + 1 : undefined;
+    },
+    initialPageParam: 1,
   });
 }
 
