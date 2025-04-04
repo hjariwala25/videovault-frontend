@@ -30,18 +30,62 @@ export default function SubscribersModal({
   );
   const toggleSubscription = useToggleSubscription();
 
+  const [localSubscribers, setLocalSubscribers] = useState<
+    {
+      subscriber: {
+        _id: string;
+        username: string;
+        fullname: string;
+        avatar?: string;
+        subscribersCount?: number;
+        subscribedToSubscriber: boolean;
+      };
+    }[]
+  >([]);
+
+  useEffect(() => {
+    if (subscribers) {
+      setLocalSubscribers(subscribers);
+    }
+  }, [subscribers]);
+
   // Only render on client side and when open
   if (!isMounted || !isOpen) return null;
 
   const handleToggleSubscription = (subscriberId: string) => {
-    toggleSubscription.mutate(subscriberId, {
-      onSuccess: () => {
-        toast.success("Subscription updated successfully");
-      },
-      onError: () => {
-        toast.error("Failed to update subscription");
-      },
-    });
+    // Find the subscriber in our local state
+    const updatedSubscribers = [...localSubscribers];
+    const subscriberIndex = updatedSubscribers.findIndex(
+      (sub) => sub.subscriber._id === subscriberId
+    );
+
+    if (subscriberIndex >= 0) {
+      // Store current state before toggling
+      const wasSubscribed =
+        updatedSubscribers[subscriberIndex].subscriber.subscribedToSubscriber;
+
+      updatedSubscribers[subscriberIndex].subscriber.subscribedToSubscriber =
+        !wasSubscribed;
+      setLocalSubscribers(updatedSubscribers);
+
+      toggleSubscription.mutate(subscriberId, {
+        onSuccess: () => {
+          toast.success(
+            wasSubscribed
+              ? "Unsubscribed successfully"
+              : "Subscribed successfully"
+          );
+        },
+        onError: () => {
+          // Revert the optimistic update on error
+          updatedSubscribers[
+            subscriberIndex
+          ].subscriber.subscribedToSubscriber = wasSubscribed;
+          setLocalSubscribers(updatedSubscribers);
+          toast.error("Failed to update subscription");
+        },
+      });
+    }
   };
 
   return (
@@ -69,9 +113,9 @@ export default function SubscribersModal({
               </div>
               <p className="text-adaptive-muted">Loading subscribers...</p>
             </div>
-          ) : subscribers && subscribers.length > 0 ? (
+          ) : localSubscribers && localSubscribers.length > 0 ? (
             <div className="space-y-3">
-              {subscribers.map(
+              {localSubscribers.map(
                 (sub: {
                   subscriber: {
                     _id: string;

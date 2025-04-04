@@ -275,7 +275,7 @@ export default function VideoPage() {
               ) : owner.isSubscribed ? (
                 <>
                   <UserCheck className="mr-1.5 h-4 w-4" />
-                  Unsubscribe
+                  Subscribed
                 </>
               ) : (
                 <>

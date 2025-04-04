@@ -14,6 +14,7 @@ import { useState, useEffect, useMemo } from "react";
 import { MessageSquare, Film, UserCheck, UserPlus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Video } from "@/types";
+import { toast } from "sonner";
 
 // Define tab types for type safety
 type TabType = "videos" | "tweets";
@@ -29,7 +30,7 @@ export default function Channel() {
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("videos");
 
-// Get videos from the videoData
+  // Get videos from the videoData
   const videos = useMemo(
     () => videoData?.pages?.flatMap((page) => page.videos || []) || [],
     [videoData]
@@ -173,7 +174,30 @@ export default function Channel() {
 
           {!isOwnChannel && (
             <Button
-              onClick={() => channel && toggleSubscription.mutate(channel._id)}
+              onClick={() => {
+                if (channel?._id) {
+                  // Store current subscription state before toggling
+                  const wasSubscribed = channel.isSubscribed;
+
+                  channel.isSubscribed = !wasSubscribed;
+
+                  toggleSubscription.mutate(channel._id, {
+                    onSuccess: () => {
+                      // Toast notification for success
+                      toast.success(
+                        wasSubscribed
+                          ? "Unsubscribed successfully"
+                          : "Subscribed successfully"
+                      );
+                    },
+                    onError: () => {
+                      channel.isSubscribed = wasSubscribed;
+
+                      toast.error("Failed to update subscription");
+                    },
+                  });
+                }
+              }}
               disabled={toggleSubscription.isPending}
               className={`mt-4 sm:mt-0 ${
                 channel?.isSubscribed
