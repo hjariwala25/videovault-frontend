@@ -10,7 +10,7 @@ import MainLayout from "@/components/layout/MainLayout";
 import VideoCard from "@/components/common/VideoCard";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { MessageSquare, Film, UserCheck, UserPlus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Video } from "@/types";
@@ -29,15 +29,19 @@ export default function Channel() {
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("videos");
 
-  // Extract the videos array from the paginated response
-  const videos = videoData?.videos || [];
+// Get videos from the videoData
+  const videos = useMemo(
+    () => videoData?.pages?.flatMap((page) => page.videos || []) || [],
+    [videoData]
+  );
 
   useEffect(() => {
     setIsClient(true);
     if (videoData) {
       console.log("Channel videos data:", videoData);
+      console.log("Extracted videos:", videos);
     }
-  }, [videoData]);
+  }, [videoData, videos]);
 
   if (!isClient) return null;
   if (isLoading)
