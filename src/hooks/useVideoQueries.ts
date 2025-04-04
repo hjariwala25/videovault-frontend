@@ -38,7 +38,6 @@ export function useVideosByIds(videoIds: string[]) {
 
       for (const id of videoIds) {
         try {
-        
           const response = await api.get(`/video/v/${id}`);
           console.log(`Fetched video ${id}:`, response.data);
 
@@ -112,7 +111,7 @@ export function useDeleteVideo() {
 
   return useMutation({
     mutationFn: async (videoId: string) => {
-      const response = await api.delete(`/video/videos/${videoId}`);
+      const response = await api.delete(`/video/v/${videoId}`);
       return response.data;
     },
     onSuccess: () => {
@@ -134,11 +133,32 @@ export function useTogglePublishStatus() {
       return response.data;
     },
     onSuccess: (data, videoId) => {
-      // Invalidate relevant queries
+      // Get current cache data
+      const currentCache = queryClient.getQueryData(
+        queryKeys.dashboard.videos()
+      );
+
+      // If we have cached videos, update the toggled video's publish status
+      if (Array.isArray(currentCache)) {
+        const updatedCache = currentCache.map((video) => {
+          if (video._id === videoId) {
+            // Return a new object with updated isPublished status
+            return {
+              ...video,
+              isPublished: !video.isPublished,
+            };
+          }
+          return video;
+        });
+
+        // Update the cache with our modified data
+        queryClient.setQueryData(queryKeys.dashboard.videos(), updatedCache);
+      }
+
+      // Invalidate other related queries
       queryClient.invalidateQueries({
         queryKey: queryKeys.videos.detail(videoId),
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.videos() });
       queryClient.invalidateQueries({ queryKey: queryKeys.videos.all });
     },
   });

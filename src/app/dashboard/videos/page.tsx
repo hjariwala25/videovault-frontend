@@ -24,7 +24,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, Eye, MoreVertical, Play, Trash2, Video, FileUp } from "lucide-react";
+import {
+  Edit,
+  Eye,
+  MoreVertical,
+  Play,
+  Trash2,
+  Video,
+  FileUp,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function Videos() {
@@ -213,26 +221,9 @@ export default function Videos() {
                               <Eye className="h-3.5 w-3.5 text-gray-600 dark:text-gray-400" />
                             </div>
                             <span>
-                              {(() => {
-                                // Handle various possible formats
-                                if (typeof video.views === "number") {
-                                  return video.views.toLocaleString();
-                                }
-                                if (
-                                  typeof video.views === "string" &&
-                                  !isNaN(Number(video.views))
-                                ) {
-                                  return Number(video.views).toLocaleString();
-                                }
-                                if (
-                                  video.views &&
-                                  typeof video.views === "object" &&
-                                  "count" in video.views
-                                ) {
-                                  return video.views.count.toLocaleString();
-                                }
-                                return "0";
-                              })()}
+                              {typeof video.views === "number"
+                                ? video.views.toLocaleString()
+                                : "0"}
                             </span>
                           </div>
                         </TableCell>
