@@ -4,7 +4,7 @@ import { useState } from "react";
 import Header from "./Header";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Film, Upload, Video } from "lucide-react";
+import { LayoutDashboard, Film, Upload } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -14,7 +14,13 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
 
+
   const isActive = (path: string) => {
+    if (path === "/dashboard") {
+      // For the dashboard root path, "/dashboard"
+      return pathname === "/dashboard";
+    }
+    // For other paths
     return pathname === path || pathname.startsWith(`${path}/`);
   };
 
@@ -22,25 +28,6 @@ export default function DashboardLayout({
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
     { href: "/dashboard/videos", label: "Videos", icon: Film },
     { href: "/dashboard/upload", label: "Upload", icon: Upload },
-  ];
-
-  const dashboardNavItems = [
-    {
-      title: "Overview",
-      href: "/dashboard",
-      icon: <LayoutDashboard className="h-4 w-4" />,
-    },
-    {
-      title: "Videos",
-      href: "/dashboard/videos",
-      icon: <Video className="h-4 w-4" />,
-    },
-    {
-      title: "Upload",
-      href: "/dashboard/upload",
-      icon: <Upload className="h-4 w-4" />,
-    },
-    // Add any other existing items
   ];
 
   return (

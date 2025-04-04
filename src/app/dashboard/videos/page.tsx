@@ -24,14 +24,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, Eye, MoreVertical, Play, Trash2, Video } from "lucide-react";
+import { Edit, Eye, MoreVertical, Play, Trash2, Video, FileUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function Videos() {
   const { data: videos, isLoading, error, refetch } = useChannelVideos();
   const deleteVideo = useDeleteVideo();
   const togglePublish = useTogglePublishStatus();
-  //   const [confirmingDelete, setConfirmingDelete] = useState<string | null>(null);
 
   const handleDelete = async (videoId: string) => {
     toast.promise(
@@ -76,7 +75,7 @@ export default function Videos() {
             <Skeleton className="h-8 w-32" />
             <Skeleton className="h-10 w-32" />
           </div>
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+          <div className="glass-effect rounded-xl border border-gray-100 dark:border-gray-800/40 shadow-sm">
             <div className="p-4">
               <Table>
                 <TableHeader>
@@ -130,7 +129,9 @@ export default function Videos() {
           <div className="text-red-600 dark:text-red-400 mb-6 p-4 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-900/20">
             Error loading videos: {error.message}
           </div>
-          <Button onClick={() => refetch()}>Try Again</Button>
+          <Button onClick={() => refetch()} className="btn-dark">
+            Try Again
+          </Button>
         </div>
       </DashboardLayout>
     );
@@ -140,121 +141,180 @@ export default function Videos() {
     <DashboardLayout>
       <div className="p-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-adaptive-heading">
             Your Videos
           </h1>
           <Link href="/dashboard/upload">
-            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+            <Button className="gradient-bg text-white shadow-sm hover:shadow transition-all">
               <Video className="mr-2 h-4 w-4" /> Upload New Video
             </Button>
           </Link>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm">
+        <div className="glass-effect rounded-xl border border-gray-200 dark:border-gray-800 shadow-md overflow-hidden">
           {videos && videos.length > 0 ? (
-            <Table>
-              <TableHeader className="bg-gray-50 dark:bg-gray-900/60">
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Stats</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {videos.map(
-                  (video: {
-                    _id: string;
-                    title: string;
-                    isPublished: boolean;
-                    views?: number;
-                  }) => (
-                    <TableRow key={video._id}>
-                      <TableCell className="font-medium">
-                        {video.title}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={video.isPublished ? "default" : "secondary"}
-                        >
-                          {video.isPublished ? "Published" : "Draft"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                          <Eye className="h-3.5 w-3.5 mr-1" />
-                          <span>{video.views || 0}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end items-center gap-2">
-                          <Link href={`/video/${video._id}`}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              title="View video"
-                            >
-                              <Play className="h-4 w-4" />
-                            </Button>
-                          </Link>
-
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
-                            >
-                              <Link
-                                href={`/dashboard/videos/${video._id}/edit`}
-                              >
-                                <DropdownMenuItem className="cursor-pointer">
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  Edit
-                                </DropdownMenuItem>
-                              </Link>
-                              <DropdownMenuItem
-                                className="cursor-pointer"
-                                onClick={() =>
-                                  handleTogglePublish(
-                                    video._id,
-                                    video.isPublished
-                                  )
+            <div className="overflow-x-auto">
+              <Table className="w-full">
+                <TableHeader className="bg-gray-50/90 dark:bg-gray-800/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-200 font-medium text-sm">
+                      Title
+                    </TableHead>
+                    <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-200 font-medium text-sm">
+                      Status
+                    </TableHead>
+                    <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-200 font-medium text-sm">
+                      Stats
+                    </TableHead>
+                    <TableHead className="py-4 px-6 text-right text-gray-700 dark:text-gray-200 font-medium text-sm">
+                      Actions
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="bg-white/70 dark:bg-gray-900/80">
+                  {videos.map(
+                    (video: {
+                      _id: string;
+                      title: string;
+                      isPublished: boolean;
+                      views?: number | string | { count: number };
+                    }) => (
+                      <TableRow
+                        key={video._id}
+                        className="border-b border-gray-100 dark:border-gray-800/40 transition-colors hover:bg-gray-50/70 dark:hover:bg-gray-800/30"
+                      >
+                        <TableCell className="py-4 px-6 font-medium text-gray-900 dark:text-gray-50">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 w-10 h-6 rounded overflow-hidden bg-gray-100 dark:bg-gray-800 mr-3 flex items-center justify-center">
+                              <Video className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                            </div>
+                            <span className="truncate max-w-[250px]">
+                              {video.title}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-4 px-6">
+                          <Badge
+                            variant={
+                              video.isPublished ? "default" : "secondary"
+                            }
+                            className={
+                              video.isPublished
+                                ? "bg-green-50 text-green-800 dark:bg-green-900/40 dark:text-green-300 border border-green-500/40 dark:border-green-500/60 font-medium px-3 py-1"
+                                : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700 font-medium px-3 py-1"
+                            }
+                          >
+                            {video.isPublished ? "Published" : "Draft"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="py-4 px-6">
+                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 font-medium">
+                            <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-1.5 mr-2">
+                              <Eye className="h-3.5 w-3.5 text-gray-600 dark:text-gray-400" />
+                            </div>
+                            <span>
+                              {(() => {
+                                // Handle various possible formats
+                                if (typeof video.views === "number") {
+                                  return video.views.toLocaleString();
                                 }
+                                if (
+                                  typeof video.views === "string" &&
+                                  !isNaN(Number(video.views))
+                                ) {
+                                  return Number(video.views).toLocaleString();
+                                }
+                                if (
+                                  video.views &&
+                                  typeof video.views === "object" &&
+                                  "count" in video.views
+                                ) {
+                                  return video.views.count.toLocaleString();
+                                }
+                                return "0";
+                              })()}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-4 px-6 text-right">
+                          <div className="flex justify-end items-center gap-2">
+                            <Link href={`/video/${video._id}`}>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="View video"
+                                className="icon-btn-dark rounded-full h-9 w-9 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
                               >
-                                <Play className="mr-2 h-4 w-4" />
-                                {video.isPublished ? "Unpublish" : "Publish"}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="cursor-pointer text-red-600 dark:text-red-400"
-                                onClick={() => handleDelete(video._id)}
+                                <Play className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+                              </Button>
+                            </Link>
+
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="icon-btn-dark rounded-full h-9 w-9 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                >
+                                  <MoreVertical className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                className="glass-effect border border-gray-100 dark:border-gray-800/40 shadow-lg rounded-lg p-1 min-w-[160px]"
                               >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )
-                )}
-              </TableBody>
-            </Table>
+                                <Link
+                                  href={`/dashboard/videos/${video._id}/edit`}
+                                >
+                                  <DropdownMenuItem className="cursor-pointer text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-black/40 rounded-md px-3 py-2 my-0.5">
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                </Link>
+                                <DropdownMenuItem
+                                  className="cursor-pointer text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-black/40 rounded-md px-3 py-2 my-0.5"
+                                  onClick={() =>
+                                    handleTogglePublish(
+                                      video._id,
+                                      video.isPublished
+                                    )
+                                  }
+                                >
+                                  <FileUp className="mr-2 h-4 w-4" />
+                                  {video.isPublished ? "Unpublish" : "Publish"}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="cursor-pointer text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md px-3 py-2 my-0.5"
+                                  onClick={() => handleDelete(video._id)}
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           ) : (
             <div className="p-8 text-center">
-              <Video className="h-12 w-12 mx-auto mb-4 text-gray-400 dark:text-gray-600" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800/60 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <Video className="h-10 w-10 text-gray-400 dark:text-gray-600" />
+              </div>
+              <h3 className="text-lg font-medium text-adaptive-heading mb-2">
                 No videos yet
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Upload your first video to get started.
+              <p className="text-adaptive-muted mb-4 max-w-md mx-auto">
+                Upload your first video to get started. You can manage all your
+                content from this dashboard.
               </p>
               <Link href="/dashboard/upload">
-                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                <Button className="gradient-bg text-white shadow-sm hover:shadow-md transition-all">
+                  <Video className="mr-2 h-4 w-4" />
                   Upload New Video
                 </Button>
               </Link>

@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, UploadCloud, Video } from "lucide-react";
+import { Loader2, UploadCloud, Video, Image } from "lucide-react";
 
 export default function Upload() {
   const [file, setFile] = useState<File | null>(null);
@@ -118,15 +118,14 @@ export default function Upload() {
       return;
     }
 
-    // Check if description is empty
     if (!description.trim()) {
       toast.error("Please enter a description for the video");
       return;
     }
 
     const formData = new FormData();
-    formData.append("videoFile", file); 
-    formData.append("thumbnail", thumbnail); 
+    formData.append("videoFile", file);
+    formData.append("thumbnail", thumbnail);
     formData.append("title", title);
     formData.append("description", description);
 
@@ -156,16 +155,19 @@ export default function Upload() {
   return (
     <DashboardLayout>
       <div className="p-4 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        <h1 className="text-2xl font-bold text-adaptive-heading mb-6">
           Upload New Video
         </h1>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Video Details</CardTitle>
+        <Card className="glass-effect border border-gray-100 dark:border-gray-800/40 shadow-md">
+          <CardHeader className="border-b border-gray-100 dark:border-gray-800/40 bg-gray-50/90 dark:bg-gray-950/30 backdrop-blur-sm">
+            <CardTitle className="text-adaptive-heading">
+              Video Details
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Video Upload Area */}
               <div
                 className={`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-colors ${
                   isDragging
@@ -192,10 +194,10 @@ export default function Upload() {
                 {file ? (
                   <div className="space-y-2">
                     <Video className="h-12 w-12 mx-auto text-blue-500 dark:text-blue-400" />
-                    <div className="text-sm text-gray-600 dark:text-gray-400 truncate max-w-md mx-auto">
+                    <div className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-md mx-auto">
                       {file.name}
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                    <p className="text-xs text-adaptive-muted">
                       {(file.size / (1024 * 1024)).toFixed(2)}MB
                     </p>
                     <Button
@@ -207,28 +209,27 @@ export default function Upload() {
                         setFile(null);
                       }}
                       disabled={uploadMutation.isPending}
+                      className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                     >
                       Change File
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <UploadCloud className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-600" />
+                    <UploadCloud className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" />
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Drag and drop your video or click to browse
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                    <p className="text-xs text-adaptive-muted">
                       MP4, WebM, or QuickTime (max 100MB)
                     </p>
                   </div>
                 )}
               </div>
 
+              {/* Title Field */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="title"
-                  className="text-gray-900 dark:text-white"
-                >
+                <Label htmlFor="title" className="text-adaptive-heading">
                   Video Title <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -237,60 +238,33 @@ export default function Upload() {
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter a descriptive title"
                   disabled={uploadMutation.isPending}
-                  className="border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+                  className="input-dark shadow-sm"
                 />
               </div>
 
+              {/* Description Field */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="description"
-                  className="text-gray-900 dark:text-white"
-                >
-                  Description
+                <Label htmlFor="description" className="text-adaptive-heading">
+                  Description <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Provide details about your video"
-                  className="min-h-[100px] border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+                  className="min-h-[100px] input-dark shadow-sm"
                   disabled={uploadMutation.isPending}
                 />
               </div>
 
+              {/* Thumbnail Upload */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="thumbnail"
-                  className="text-gray-900 dark:text-white"
-                >
-                  Thumbnail <span className="text-red-500">*</span>
-                </Label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleThumbnailChange}
-                  disabled={uploadMutation.isPending}
-                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 dark:border-gray-600 dark:placeholder-gray-400"
-                />
-                {thumbnailPreview && (
-                  <img
-                    src={thumbnailPreview}
-                    alt="Thumbnail Preview"
-                    className="mt-2 w-full h-auto rounded-lg"
-                  />
-                )}
-              </div>
-
-              <div className="mt-6">
-                <Label
-                  htmlFor="thumbnail"
-                  className="text-gray-900 dark:text-white"
-                >
+                <Label htmlFor="thumbnail" className="text-adaptive-heading">
                   Thumbnail Image <span className="text-red-500">*</span>
                 </Label>
                 <div className="mt-2">
                   {thumbnailPreview ? (
-                    <div className="relative aspect-video mb-3 border rounded-md overflow-hidden">
+                    <div className="relative aspect-video mb-3 border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden shadow-sm">
                       <img
                         src={thumbnailPreview}
                         alt="Thumbnail preview"
@@ -300,7 +274,7 @@ export default function Upload() {
                         type="button"
                         variant="destructive"
                         size="sm"
-                        className="absolute top-2 right-2 bg-red-600 hover:bg-red-700"
+                        className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600"
                         onClick={() => {
                           setThumbnail(null);
                           setThumbnailPreview(null);
@@ -311,31 +285,17 @@ export default function Upload() {
                     </div>
                   ) : (
                     <div
-                      className="border-2 border-dashed rounded-lg p-4 mt-1 text-center cursor-pointer transition-colors hover:border-gray-400 dark:hover:border-gray-600"
+                      className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors hover:border-gray-400 dark:hover:border-gray-600 bg-gray-50/50 dark:bg-gray-900/30"
                       onClick={() =>
                         document.getElementById("thumbnail-input")?.click()
                       }
                     >
-                      <div className="space-y-1">
-                        <div className="mx-auto h-12 w-12 text-gray-400">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                            />
-                          </svg>
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                      <div className="space-y-2">
+                        <Image className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" />
+                        <div className="text-sm text-gray-600 dark:text-gray-300">
                           Click to upload thumbnail
                         </div>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-adaptive-muted">
                           PNG, JPG, WEBP up to 2MB
                         </p>
                       </div>
@@ -352,27 +312,29 @@ export default function Upload() {
                 </div>
               </div>
 
+              {/* Upload Progress */}
               {uploadMutation.isPending && (
-                <div className="space-y-2">
+                <div className="space-y-2 py-2">
                   <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-blue-500 dark:bg-blue-600 rounded-full transition-all duration-300"
+                      className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 dark:from-blue-600 dark:to-indigo-600 rounded-full transition-all duration-300"
                       style={{ width: `${uploadProgress}%` }}
                     ></div>
                   </div>
-                  <p className="text-sm text-center text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-center text-adaptive-muted">
                     {uploadProgress}% uploaded
                   </p>
                 </div>
               )}
 
-              <div className="flex justify-end space-x-2 pt-2">
+              {/* Form Actions */}
+              <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100 dark:border-gray-800/40 mt-6">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => router.push("/dashboard/videos")}
                   disabled={uploadMutation.isPending}
-                  className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
+                  className="border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                   Cancel
                 </Button>
@@ -381,12 +343,12 @@ export default function Upload() {
                   disabled={
                     uploadMutation.isPending ||
                     !file ||
-                    !thumbnail || // Add this check
+                    !thumbnail ||
                     !title.trim() ||
                     !description.trim() ||
                     isValidating
                   }
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  className="gradient-bg text-white shadow-sm hover:shadow transition-all"
                 >
                   {uploadMutation.isPending ? (
                     <>
