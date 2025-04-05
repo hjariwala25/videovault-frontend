@@ -8,30 +8,25 @@ import api from "@/services/api";
 import { queryKeys } from "@/lib/queryKeys";
 // import { Video } from '@/types';
 
-// Get videos with optional filtering
+// Get all videos
 export function useVideos(params = {}) {
   return useInfiniteQuery({
     queryKey: queryKeys.videos.list(params),
     queryFn: async ({ pageParam = 1 }) => {
       const response = await api.get("/video/videos", {
         params: {
-          ...params,
+          ...params, // This includes the query parameter
           page: pageParam,
-          limit: 10, // Match your API's default limit
+          limit: 9,
         },
       });
-      console.log(`Fetched page ${pageParam}:`, response.data);
+
       return response.data.data;
     },
     getNextPageParam: (lastPage) => {
-      // The API returns page, limit, and totalVideos - not currentPage/totalPages
+      // Calculate totalPages from totalVideos and limit
       const { page, limit, totalVideos } = lastPage;
-
-      // Calculate if there are more pages
       const totalPages = Math.ceil(totalVideos / limit);
-      console.log(`Current page: ${page}, Total pages: ${totalPages}`);
-
-      // Return the next page number or undefined if we're on the last page
       return page < totalPages ? page + 1 : undefined;
     },
     initialPageParam: 1,
@@ -57,13 +52,13 @@ export function useVideosByIds(videoIds: string[]) {
     queryFn: async () => {
       if (!videoIds.length) return [];
 
-      console.log("Fetching individual videos for IDs:", videoIds);
+      // console.log("Fetching individual videos for IDs:", videoIds);
       const videos = [];
 
       for (const id of videoIds) {
         try {
           const response = await api.get(`/video/v/${id}`);
-          console.log(`Fetched video ${id}:`, response.data);
+          // console.log(`Fetched video ${id}:`, response.data);
 
           if (response.data.data) {
             videos.push(response.data.data);
@@ -76,7 +71,7 @@ export function useVideosByIds(videoIds: string[]) {
         }
       }
 
-      console.log("Successfully fetched videos:", videos.length);
+      // console.log("Successfully fetched videos:", videos.length);
       return videos;
     },
     enabled: videoIds.length > 0,

@@ -10,12 +10,11 @@ export const queryKeys = {
 
   // Video related keys
   videos: {
-    all: ["videos"] as const,
-    list: (params: { [key: string]: string | number | boolean }) =>
-      ["videos", "list", params] as const,
-    detail: (id: string) => ["videos", "detail", id] as const,
-    byIds: (ids: string[]) => ["videos", "byIds", ids] as const,
-    liked: () => ["videos", "liked"] as const,
+    all: ["videos"],
+    list: (params = {}) => ["videos", "list", params],
+    detail: (id: string) => ["videos", "detail", id],
+    byIds: (ids: string[]) => ["videos", "byIds", ids],
+    liked: () => ["videos", "liked"],
   },
   // Comment related keys
   comments: {
@@ -54,6 +53,10 @@ export const queryKeys = {
     all: ["dashboard"],
     stats: () => [...queryKeys.dashboard.all, "stats"],
     videos: () => [...queryKeys.dashboard.all, "videos"],
-    analytics: (period: string) => [...queryKeys.dashboard.all, "analytics", period],
+    analytics: (period: string) => [
+      ...queryKeys.dashboard.all,
+      "analytics",
+      period,
+    ],
   },
 };

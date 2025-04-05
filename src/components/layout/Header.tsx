@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import {
   Menu,
   X,
-  Search,
   Bell,
   Upload,
   User,
@@ -25,11 +24,11 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useCurrentUser } from "@/hooks/useUserQueries";
+import SearchBar from "@/components/common/SearchBar";
 
 export default function Header() {
   const router = useRouter();
   const { data: user } = useCurrentUser();
-  const [searchQuery, setSearchQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -42,12 +41,8 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      setMobileMenuOpen(false);
-    }
+  const handleSearchComplete = () => {
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -86,28 +81,10 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Search bar */}
-          <form
-            onSubmit={handleSearch}
-            className="hidden md:flex relative w-full max-w-md mx-4 group"
-          >
-            <input
-              type="text"
-              placeholder="Search videos..."
-              className="w-full py-2 pl-12 pr-4 rounded-full border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-black focus:bg-white dark:focus:bg-black focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-500/50 transition-all duration-200 text-gray-900 dark:text-white"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors duration-200">
-              <Search size={18} />
-            </div>
-            <button
-              type="submit"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 text-white p-1 rounded-full transition-colors duration-200"
-            >
-              <Search size={16} />
-            </button>
-          </form>
+          {/* Desktop Search Bar */}
+          <div className="hidden md:block w-full max-w-md mx-4">
+            <SearchBar placeholder="Search" onSearch={handleSearchComplete} />
+          </div>
 
           {/* Navigation and profile */}
           <div className="flex items-center space-x-1 sm:space-x-3">
@@ -120,13 +97,6 @@ export default function Header() {
                 >
                   <Upload size={20} />
                 </Link>
-
-                <button
-                  className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full hover:bg-blue-50 dark:hover:bg-black/40 transition-all duration-200"
-                  onClick={() => router.push("/notifications")}
-                >
-                  <Bell size={20} />
-                </button>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -220,27 +190,10 @@ export default function Header() {
       {/* Mobile Search - shows when menu is open */}
       {mobileMenuOpen && (
         <div className="md:hidden px-4 py-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-black">
-          <form onSubmit={handleSearch} className="flex">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                placeholder="Search videos..."
-                className="w-full py-2 pl-10 pr-4 rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-black focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-500/50 text-gray-900 dark:text-white"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <Search
-                size={18}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
-              />
-            </div>
-            <button
-              type="submit"
-              className="ml-2 px-4 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg flex items-center"
-            >
-              Search
-            </button>
-          </form>
+          <SearchBar
+            placeholder="Search videos..."
+            onSearch={handleSearchComplete}
+          />
         </div>
       )}
     </header>
