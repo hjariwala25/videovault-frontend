@@ -2,6 +2,8 @@ import { DashboardStats } from "@/types";
 import { Users, ThumbsUp, Eye, Film } from "lucide-react";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queryKeys";
 
 //SSR is disabled for the modal to prevent hydration errors
 const SubscribersModal = dynamic(() => import("./SubscribersModal"), {
@@ -15,10 +17,19 @@ interface StatsOverviewProps {
 export default function StatsOverview({ stats }: StatsOverviewProps) {
   const [showSubscribersModal, setShowSubscribersModal] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const queryClient = useQueryClient();
 
+  // Set up automatic refresh interval
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+
+    // Set up interval to refresh stats every minute
+    const intervalId = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats() });
+    }, 2000);
+
+    return () => clearInterval(intervalId);
+  }, [queryClient]);
 
   return (
     <>

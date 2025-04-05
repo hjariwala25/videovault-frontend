@@ -32,18 +32,72 @@ import {
   Trash2,
   Video,
   FileUp,
+  ThumbsUp,
+  RefreshCw,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queryKeys";
 
 export default function Videos() {
-  const { data: videos, isLoading, error, refetch } = useChannelVideos();
+  const queryClient = useQueryClient();
+  const {
+    data: videos,
+    isLoading,
+    error,
+    refetch,
+    isFetching,
+  } = useChannelVideos();
   const deleteVideo = useDeleteVideo();
   const togglePublish = useTogglePublishStatus();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Set up automatic refresh when tab becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        // Invalidate and refetch when tab becomes visible
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.dashboard.videos(),
+        });
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [queryClient]);
+
+  // Manually refresh data with visual feedback
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+
+    try {
+      // Invalidate the query to force a refetch
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.videos() });
+      await refetch();
+      toast.success("Video data refreshed");
+    } catch (error) {
+      console.error("Refresh error:", error);
+      toast.error("Failed to refresh data");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const handleDelete = async (videoId: string) => {
     toast.promise(
       deleteVideo.mutateAsync(videoId).then(() => {
-        refetch();
+      
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.dashboard.videos(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.dashboard.stats(),
+        });
       }),
       {
         loading: "Deleting video...",
@@ -59,7 +113,10 @@ export default function Videos() {
   ) => {
     toast.promise(
       togglePublish.mutateAsync(videoId).then(() => {
-        refetch();
+        // Invalidate relevant queries after status change
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.dashboard.videos(),
+        });
       }),
       {
         loading: `${
@@ -75,6 +132,7 @@ export default function Videos() {
     );
   };
 
+  // loading skeleton
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -98,6 +156,9 @@ export default function Videos() {
                       <Skeleton className="h-4 w-12" />
                     </TableHead>
                     <TableHead>
+                      <Skeleton className="h-4 w-12" />
+                    </TableHead>
+                    <TableHead>
                       <Skeleton className="h-4 w-24" />
                     </TableHead>
                   </TableRow>
@@ -112,6 +173,9 @@ export default function Videos() {
                         </TableCell>
                         <TableCell>
                           <Skeleton className="h-5 w-24" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-5 w-16" />
                         </TableCell>
                         <TableCell>
                           <Skeleton className="h-5 w-16" />
@@ -149,9 +213,30 @@ export default function Videos() {
     <DashboardLayout>
       <div className="p-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-adaptive-heading">
-            Your Videos
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-adaptive-heading">
+              Your Videos
+            </h1>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleManualRefresh}
+              className="rounded-full h-8 w-8 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+              title="Refresh video data"
+              disabled={isRefreshing || isFetching}
+            >
+              <RefreshCw
+                className={`h-4 w-4 text-gray-700 dark:text-gray-300 ${
+                  isRefreshing || isFetching ? "animate-spin" : ""
+                }`}
+              />
+            </Button>
+            {isFetching && !isLoading && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                Refreshing...
+              </span>
+            )}
+          </div>
           <Link href="/dashboard/upload">
             <Button className="gradient-bg text-white shadow-sm hover:shadow transition-all">
               <Video className="mr-2 h-4 w-4" /> Upload New Video
@@ -172,7 +257,10 @@ export default function Videos() {
                       Status
                     </TableHead>
                     <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-200 font-medium text-sm">
-                      Stats
+                      Views
+                    </TableHead>
+                    <TableHead className="py-4 px-6 text-gray-700 dark:text-gray-200 font-medium text-sm">
+                      Likes
                     </TableHead>
                     <TableHead className="py-4 px-6 text-right text-gray-700 dark:text-gray-200 font-medium text-sm">
                       Actions
@@ -186,6 +274,7 @@ export default function Videos() {
                       title: string;
                       isPublished: boolean;
                       views?: number | string | { count: number };
+                      likesCount?: number;
                     }) => (
                       <TableRow
                         key={video._id}
@@ -224,6 +313,16 @@ export default function Videos() {
                               {typeof video.views === "number"
                                 ? video.views.toLocaleString()
                                 : "0"}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-4 px-6">
+                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 font-medium">
+                            <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-1.5 mr-2">
+                              <ThumbsUp className="h-3.5 w-3.5 text-gray-600 dark:text-gray-400" />
+                            </div>
+                            <span>
+                              {video.likesCount?.toLocaleString() || "0"}
                             </span>
                           </div>
                         </TableCell>
