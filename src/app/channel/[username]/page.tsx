@@ -9,6 +9,9 @@ import { useVideos } from "@/hooks/useVideoQueries";
 import MainLayout from "@/components/layout/MainLayout";
 import VideoCard from "@/components/common/VideoCard";
 import { Button } from "@/components/ui/button";
+import TweetCard from "@/components/common/TweetCard";
+import TweetForm from "@/components/common/TweetForm";
+import { Tweet } from "@/types";
 import Image from "next/image";
 import { useState, useEffect, useMemo } from "react";
 import { MessageSquare, Film, UserCheck, UserPlus } from "lucide-react";
@@ -113,7 +116,8 @@ export default function Channel() {
       </div>
     );
 
-  const isOwnChannel = currentUser?._id === channel?._id;
+  // Define if the channel being viewed is the user's own channel
+  const isOwnChannel = channel?._id === currentUser?._id;
 
   return (
     <MainLayout>
@@ -164,11 +168,11 @@ export default function Channel() {
                 {channel?.subscriberCount || 0}
               </span>{" "}
               subscribers •
-              <span className="font-medium text-gray-900 dark:text-white">
+              {/* <span className="font-medium text-gray-900 dark:text-white">
                 {" "}
                 {channel?.channelsSubscribedToCount || 0}
               </span>{" "}
-              subscribed
+              subscribed */}
             </p>
           </div>
 
@@ -281,48 +285,19 @@ export default function Channel() {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 Tweets
               </h2>
+
+              {/* Add tweet form if viewing own channel */}
+              {isOwnChannel && <TweetForm />}
+
               {tweets?.length > 0 ? (
                 <div className="space-y-4">
-                  {tweets.map(
-                    (tweet: {
-                      _id: string;
-                      content: string;
-                      createdAt: string;
-                    }) => (
-                      <div
-                        key={tweet._id}
-                        className="p-4 bg-white dark:bg-black/40 rounded-xl border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow duration-200"
-                      >
-                        <div className="flex items-center mb-3">
-                          <Image
-                            src={channel?.avatar || "/default-avatar.png"}
-                            alt={channel?.username || ""}
-                            width={36}
-                            height={36}
-                            className="rounded-full mr-3"
-                          />
-                          <div>
-                            <div className="font-medium text-gray-900 dark:text-white">
-                              {channel?.fullname}
-                            </div>
-                            <div className="text-gray-500 dark:text-gray-400 text-xs">
-                              {new Date(tweet.createdAt).toLocaleDateString(
-                                undefined,
-                                {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                }
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-gray-800 dark:text-gray-200 whitespace-pre-line">
-                          {tweet.content}
-                        </p>
-                      </div>
-                    )
-                  )}
+                  {tweets.map((tweet: Tweet) => (
+                    <TweetCard
+                      key={tweet._id}
+                      tweet={tweet}
+                      showOptions={isOwnChannel}
+                    />
+                  ))}
                 </div>
               ) : (
                 <div className="bg-white dark:bg-black/40 border border-gray-100 dark:border-gray-800 rounded-xl p-8 text-center">

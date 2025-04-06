@@ -7,8 +7,8 @@ import {
   Users,
   Clock,
   PlaySquare,
-  Heart,
   MessageSquare,
+  ThumbsUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentUser } from "@/hooks/useUserQueries";
@@ -40,7 +40,7 @@ export default function Sidebar() {
       icon: PlaySquare,
       requiresAuth: true,
     },
-    { name: "Liked Videos", href: "/liked", icon: Heart, requiresAuth: true },
+    { name: "Liked Videos", href: "/likedvideos", icon: ThumbsUp, requiresAuth: true },
     {
       name: "Tweets",
       href: "/tweets",
