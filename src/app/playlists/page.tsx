@@ -69,7 +69,7 @@ export default function Playlists() {
             <Skeleton className="h-10 w-40" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array(3)
               .fill(0)
               .map((_, i) => (
@@ -153,7 +153,7 @@ export default function Playlists() {
         </div>
 
         {playlists && playlists.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {playlists.map((playlist: Playlist) => (
               <PlaylistCard key={playlist._id} playlist={playlist} />
             ))}

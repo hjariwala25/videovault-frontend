@@ -36,7 +36,7 @@ export default function LikedVideosPage() {
       <MainLayout>
         <div className="p-4">
           <Skeleton className="h-8 w-40 mb-6" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array(6)
               .fill(0)
               .map((_, i) => (
@@ -83,7 +83,7 @@ export default function LikedVideosPage() {
         </div>
 
         {processedVideos.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {processedVideos.map((video) => (
               <VideoCard key={video._id} video={video} />
             ))}

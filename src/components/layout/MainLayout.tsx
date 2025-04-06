@@ -33,7 +33,7 @@ export default function MainLayout({
   if (!isClient) return null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-black">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-black">
       <Header />
 
       <div className="flex flex-1">
