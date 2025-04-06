@@ -92,7 +92,7 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="p-4">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
           Dashboard Overview
         </h1>

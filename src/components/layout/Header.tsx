@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import {
   Menu,
   X,
-  Bell,
   Upload,
   User,
   LogOut,
@@ -64,20 +63,54 @@ export default function Header() {
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
             <Link href="/" className="flex items-center group">
-              <div className="flex items-center">
-                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-2 rounded-lg mr-2 group-hover:shadow-lg transition-all duration-300">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-6 w-6 text-white"
-                    fill="currentColor"
+              <svg viewBox="0 0 24 24" className="h-8 w-8 mr-2">
+                <defs>
+                  <linearGradient
+                    id="circleGrad"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="100%"
                   >
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
-                  </svg>
-                </div>
-                <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 text-xl hidden sm:inline group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-300">
-                  VideoVault
-                </span>
-              </div>
+                    <stop
+                      offset="0%"
+                      style={{ stopColor: "#3b82f6", stopOpacity: 1 }}
+                    />
+                    <stop
+                      offset="100%"
+                      style={{ stopColor: "#9333ea", stopOpacity: 1 }}
+                    />
+                  </linearGradient>
+                  <linearGradient
+                    id="playGrad"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="0%"
+                  >
+                    <stop
+                      offset="0%"
+                      style={{ stopColor: "#ffffff", stopOpacity: 1 }}
+                    />
+                    <stop
+                      offset="100%"
+                      style={{ stopColor: "#e5e7eb", stopOpacity: 1 }}
+                    />
+                  </linearGradient>
+                </defs>
+                <path
+                  fill="url(#circleGrad)"
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+                />
+                <path
+                  fill="url(#playGrad)"
+                  d="M10 7.5L16 12L10 16.5Z"
+                  transform="rotate(5 12 12)"
+                />
+              </svg>
+              <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 text-xl hidden sm:inline group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-300">
+                VideoVault
+              </span>
             </Link>
           </div>
 

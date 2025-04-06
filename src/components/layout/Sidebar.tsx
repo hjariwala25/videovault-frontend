@@ -40,7 +40,12 @@ export default function Sidebar() {
       icon: PlaySquare,
       requiresAuth: true,
     },
-    { name: "Liked Videos", href: "/likedvideos", icon: ThumbsUp, requiresAuth: true },
+    {
+      name: "Liked Videos",
+      href: "/likedvideos",
+      icon: ThumbsUp,
+      requiresAuth: true,
+    },
     {
       name: "Tweets",
       href: "/tweets",
@@ -56,14 +61,17 @@ export default function Sidebar() {
         expanded ? "w-64" : "w-20"
       )}
     >
-      <div className="p-2">
+      <div className="p-1">
         <button
           className="w-full px-3 py-2 text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-blue-900/10 dark:hover:text-blue-300 rounded-lg mb-2 flex items-center justify-between transition-all duration-200"
           onClick={() => setExpanded(!expanded)}
         >
           {expanded ? (
             <>
-              <span>Collapse</span>
+              <span className="flex items-center group-hover:translate-x-[-2px] transition-transform">
+                {/* <PanelLeftClose className="mr-1.5 h-4 w-4" /> */}
+                <span>Collapse Menu</span>
+              </span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -149,7 +157,7 @@ export default function Sidebar() {
                   alt={user.username}
                   width={40}
                   height={40}
-                  className="rounded-full border-2 border-white dark:border-gray-800 shadow-sm group-hover:border-blue-200 dark:group-hover:border-blue-800"
+                  className="rounded-full h-10 w-10 border-2 border-white dark:border-gray-800 shadow-sm group-hover:border-blue-200 dark:group-hover:border-blue-800"
                 />
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">

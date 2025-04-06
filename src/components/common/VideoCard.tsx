@@ -138,7 +138,7 @@ const VideoCard = forwardRef<HTMLDivElement, VideoCardProps>(
                   alt={owner.username}
                   width={40}
                   height={40}
-                  className="rounded-full border-2 border-white shadow-sm"
+                  className="rounded-full h-10 w-10 border-2 shadow-sm"
                 />
               </Link>
             )}

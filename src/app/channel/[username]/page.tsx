@@ -168,11 +168,11 @@ export default function Channel() {
                 {channel?.subscriberCount || 0}
               </span>{" "}
               subscribers •
-              {/* <span className="font-medium text-gray-900 dark:text-white">
+               <span className="font-medium text-gray-900 dark:text-white">
                 {" "}
-                {channel?.channelsSubscribedToCount || 0}
+                {videos.length || 0}
               </span>{" "}
-              subscribed */}
+              videos
             </p>
           </div>
 

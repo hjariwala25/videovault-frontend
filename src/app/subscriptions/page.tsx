@@ -169,7 +169,7 @@ export default function Subscriptions() {
                               alt={username}
                               width={80}
                               height={80}
-                              className="relative rounded-full object-cover border-[3px] border-white dark:border-gray-800 shadow-sm z-10"
+                              className="relative h-15 w-15 rounded-full object-cover border-[3px] border-white dark:border-gray-800 shadow-sm z-10"
                             />
                           </div>
                         </div>

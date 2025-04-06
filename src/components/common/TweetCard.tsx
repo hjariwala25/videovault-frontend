@@ -122,11 +122,11 @@ export default function TweetCard({
                 alt={owner.username || "User"}
                 width={40}
                 height={40}
-                className="rounded-full mr-3 border-2 border-white dark:border-gray-800"
+                className="rounded-full h-10 w-10 border-2 border-white dark:border-gray-800"
               />
             </Link>
 
-            <div>
+            <div className="ml-3 flex flex-col">
               <Link
                 href={`/channel/${owner.username || "unknown"}`}
                 className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
