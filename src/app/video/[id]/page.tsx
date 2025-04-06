@@ -5,7 +5,7 @@ import { useVideoById } from "@/hooks/useVideoQueries";
 import { useToggleVideoLike } from "@/hooks/useLikeQueries";
 import { useVideoComments, useAddComment } from "@/hooks/useCommentQueries";
 import { useCurrentUser } from "@/hooks/useUserQueries";
-import { useToggleSubscription } from "@/hooks/useSubscriptionQueries"; // Add this import
+import { useToggleSubscription } from "@/hooks/useSubscriptionQueries"; 
 import Comment from "@/components/common/Comment";
 import CommentForm from "@/components/common/CommentForm";
 import MainLayout from "@/components/layout/MainLayout";
@@ -14,7 +14,14 @@ import { useState, useEffect } from "react";
 import { Comment as CommentType } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink, UserCheck, UserPlus } from "lucide-react"; // Add UserCheck and UserPlus
+import {
+  ExternalLink,
+  UserCheck,
+  UserPlus,
+  MessageSquare,
+  ThumbsUp,
+  ThumbsDown,
+} from "lucide-react"; 
 import { formatTimeAgo, formatCount } from "@/utils/formatTime";
 import VideoActions from "@/components/video/VideoActions";
 import { useUserPlaylists } from "@/hooks/usePlaylistQueries";
@@ -25,7 +32,8 @@ export default function VideoPage() {
   const params = useParams();
   const videoId = params.id as string;
   const { data: video, isLoading, error } = useVideoById(videoId);
-  const { data: comments } = useVideoComments(videoId);
+  const { data: comments, isLoading: commentsLoading } =
+    useVideoComments(videoId);
   const { data: currentUser } = useCurrentUser();
   const toggleLike = useToggleVideoLike();
   const addComment = useAddComment();
@@ -46,13 +54,12 @@ export default function VideoPage() {
   useEffect(() => {
     if (!userPlaylists || !videoId) return;
 
-    // Reset the states first
+    // Reset the states 
     setIsInPlaylist(false);
     setPlaylistId(null);
 
     // Check all playlists for this video
     for (const playlist of userPlaylists) {
-    
       if (playlist.videos && Array.isArray(playlist.videos)) {
         const flattenedIds = playlist.videos.flat();
         if (flattenedIds.includes(videoId)) {
@@ -64,7 +71,7 @@ export default function VideoPage() {
     }
 
     console.log("Checked if video is in playlist:", isInPlaylist, playlistId);
-  }, [userPlaylists, videoId, playlistChangeCounter]); 
+  }, [userPlaylists, videoId, playlistChangeCounter]);
 
   useEffect(() => {
     setIsClient(true);
@@ -163,9 +170,26 @@ export default function VideoPage() {
             size="sm"
             onClick={() => toggleLike.mutate(videoId)}
             disabled={toggleLike.isPending}
-            className="flex-shrink-0 border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/40 hover:text-blue-600 dark:hover:text-blue-400"
+            className={`flex-shrink-0 border-gray-200 dark:border-gray-800 ${
+              video.isLiked
+                ? "text-blue-600 dark:text-blue-400"
+                : "text-gray-900 dark:text-white"
+            } hover:bg-gray-100 dark:hover:bg-black/40 hover:text-blue-600 dark:hover:text-blue-400 transition-colors`}
           >
-            {video.isLiked ? "Unlike" : "Like"} ({video.likesCount || 0})
+            {toggleLike.isPending ? (
+              <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
+            ) : video.isLiked ? (
+              <>
+                <ThumbsDown className="mr-1.5 h-4 w-4" />
+                Unlike
+              </>
+            ) : (
+              <>
+                <ThumbsUp className="mr-1.5 h-4 w-4" />
+                Like
+              </>
+            )}
+            <span className="ml-1">{formatCount(video.likesCount || 0)}</span>
           </Button>
         </div>
 
@@ -177,7 +201,7 @@ export default function VideoPage() {
           </div>
         </div>
 
-        {/* Video description - MOVED UP */}
+        {/* Video description */}
         <div className="bg-gray-50 dark:bg-black/40 p-4 rounded-lg my-6">
           <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
             {video.description}
@@ -197,7 +221,7 @@ export default function VideoPage() {
                   alt={owner.username}
                   width={48}
                   height={48}
-                  className="rounded-full border-2 border-white dark:border-gray-800 shadow-sm group-hover:border-blue-200 dark:group-hover:border-blue-700 transition-all"
+                  className="rounded-full h-10 w-10 border-2 border-white dark:border-gray-800 shadow-sm group-hover:border-blue-200 dark:group-hover:border-blue-700 transition-all"
                 />
               </div>
               <div>
@@ -246,10 +270,9 @@ export default function VideoPage() {
           {owner && currentUser && owner._id !== currentUser._id && (
             <Button
               variant="outline"
-              className="ml-auto border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-black/40 hover:text-blue-600 dark:hover:text-blue-400"
               onClick={() => {
                 if (owner?._id) {
-                  // Store current subscription state to reference in onSuccess
+                  // Store current subscription state
                   const wasSubscribed = owner.isSubscribed;
 
                   toggleSubscription.mutate(owner._id, {
@@ -268,10 +291,15 @@ export default function VideoPage() {
                   });
                 }
               }}
+              className={`flex-shrink-0 border-gray-200 dark:border-gray-800 ${
+                owner.isSubscribed
+                  ? "text-blue-600 dark:text-blue-400"
+                  : "text-gray-900 dark:text-white"
+              } hover:bg-gray-100 dark:hover:bg-black/40 hover:text-blue-600 dark:hover:text-blue-400 transition-colors`}
               disabled={toggleSubscription.isPending}
             >
               {toggleSubscription.isPending ? (
-                <div className="h-4 w-4 border-2 border-gray-600 dark:border-gray-200 border-t-transparent rounded-full animate-spin mr-2"></div>
+                <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
               ) : owner.isSubscribed ? (
                 <>
                   <UserCheck className="mr-1.5 h-4 w-4" />
@@ -294,30 +322,80 @@ export default function VideoPage() {
           onPlaylistChange={handlePlaylistChange}
         />
 
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+        {/* Comment section */}
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
             Comments
+            {comments?.length > 0 && (
+              <span className="ml-3 text-base text-gray-600 dark:text-gray-400">
+                {comments.length}
+              </span>
+            )}
           </h2>
-          {currentUser && (
+
+          {currentUser ? (
             <CommentForm
-              onSubmit={(content) => addComment.mutate({ videoId, content })}
+              onSubmit={(content) =>
+                addComment.mutate(
+                  { videoId, content },
+                  
+                )
+              }
+              isSubmitting={addComment.isPending}
             />
-          )}
-          {comments && comments.length > 0 ? (
-            <div className="mt-4 space-y-4">
-              {comments.map((comment: CommentType) => (
-                <Comment
-                  key={comment._id}
-                  comment={comment}
-                  currentUserId={currentUser?._id}
-                />
-              ))}
-            </div>
           ) : (
-            <p className="text-center mt-4 text-gray-500 dark:text-gray-400">
-              No comments yet
-            </p>
+            <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+              <Link
+                href="/login"
+                className="text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                Sign in
+              </Link>{" "}
+              to add a comment
+            </div>
           )}
+
+          {/* Comments list */}
+          <div className="mt-6 space-y-4">
+            {commentsLoading ? (
+              // Comment skeletons while loading
+              Array(3)
+                .fill(0)
+                .map((_, index) => (
+                  <div
+                    key={index}
+                    className="flex gap-4 p-4 bg-white dark:bg-black/40 rounded-xl border border-gray-100 dark:border-gray-800"
+                  >
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className="flex-1">
+                      <div className="flex justify-between">
+                        <Skeleton className="h-4 w-24 mb-2" />
+                        <Skeleton className="h-3 w-16" />
+                      </div>
+                      <Skeleton className="h-16 w-full mb-2" />
+                      <Skeleton className="h-8 w-16 rounded-full" />
+                    </div>
+                  </div>
+                ))
+            ) : comments && comments.length > 0 ? (
+              <div className="space-y-4 animate-in fade-in duration-300">
+                {comments.map((comment: CommentType) => (
+                  <Comment
+                    key={comment._id}
+                    comment={comment}
+                    videoId={videoId}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 bg-white dark:bg-black/40 rounded-xl border border-gray-100 dark:border-gray-800 animate-in fade-in duration-300">
+                <MessageSquare className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-600 mb-4" />
+                <p className="text-gray-500 dark:text-gray-400">
+                  No comments yet. Be the first to share your thoughts!
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </MainLayout>

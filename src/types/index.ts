@@ -34,22 +34,25 @@ export interface Video {
 export interface Comment {
   _id: string;
   content: string;
-  video:
-    | string
-    | {
-        _id: string;
-      };
   owner:
-    | string
     | {
         _id: string;
-        avatar?: string;
-        username?: string;
-      };
+        username: string;
+        fullname?: string;
+        avatar: string;
+      }
+    | string;
+  video:
+    | {
+        _id: string;
+        title?: string;
+        thumbnail?: string;
+      }
+    | string;
   createdAt: string;
-  updatedAt: string;
-  isLiked?: boolean;
-  likesCount?: number;
+  updatedAt?: string;
+  likesCount: number;
+  isLiked: boolean;
 }
 
 export interface Tweet {

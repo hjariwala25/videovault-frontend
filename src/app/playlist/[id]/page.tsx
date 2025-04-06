@@ -128,7 +128,7 @@ export default function PlaylistPage() {
       }
     });
 
-    console.log("Video map created:", videoMap);
+    // console.log("Video map created:", videoMap);
 
     // Update only if we found any video details
     if (Object.keys(videoMap).length > 0) {
@@ -205,7 +205,7 @@ export default function PlaylistPage() {
             <Skeleton className="h-9 w-9 rounded-full" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array(6)
               .fill(0)
               .map((_, i) => (
@@ -346,7 +346,7 @@ export default function PlaylistPage() {
         </div>
 
         {processedVideos.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {processedVideos.map((video) => (
               <div key={video._id} className="group relative">
                 <VideoCard video={video} />

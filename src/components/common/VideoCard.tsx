@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Check, Clock, Play, Save } from "lucide-react";
+import { Check, Play, Save } from "lucide-react";
 import { useState } from "react";
 import { formatTimeAgo, formatCount } from "@/utils/formatTime";
 import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
@@ -36,7 +36,6 @@ const VideoCard = forwardRef<HTMLDivElement, VideoCardProps>(
     const [isHovered, setIsHovered] = useState(false);
     const [showPlaylistModal, setShowPlaylistModal] = useState(false);
 
-    
     const owner = typeof video.owner === "string" ? null : video.owner;
 
     // Format time ago and view count
@@ -63,10 +62,28 @@ const VideoCard = forwardRef<HTMLDivElement, VideoCardProps>(
 
     const href = `/video/${video._id}`;
 
+    // Get owner details with fallback
+    const getOwnerDetails = () => {
+      if (!video.owner  || typeof video.owner === "string") {
+        return {
+          username: "channel",
+          displayName: "Channel",
+          avatar: "/default-avatar.png",
+        };
+      }
+      return {
+        username: video.owner.username,
+        displayName: video.owner.fullname || video.owner.username,
+        avatar: video.owner.avatar || "/default-avatar.png",
+      };
+    };
+
+    const { username, displayName} = getOwnerDetails();
+
     return (
       <div
         ref={ref}
-        className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm hover:shadow-md dark:shadow-gray-900/20 transition-all duration-300 group"
+        className="bg-white dark:bg-black rounded-xl overflow-hidden  hover:shadow-md dark:shadow-gray-700 transition-all duration-300 group"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -74,8 +91,8 @@ const VideoCard = forwardRef<HTMLDivElement, VideoCardProps>(
           href={href}
           className="block relative aspect-video overflow-hidden"
         >
-          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 flex items-center justify-center">
-            <div className="bg-white/90 rounded-full p-3 transform scale-0 group-hover:scale-100 transition-transform duration-300">
+          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 flex items-center justify-center rounded-xl">
+            <div className="bg-white rounded-full p-3 transform scale-0 group-hover:scale-100 transition-transform duration-300">
               <Play size={20} className="text-blue-600" />
             </div>
           </div>
@@ -85,7 +102,7 @@ const VideoCard = forwardRef<HTMLDivElement, VideoCardProps>(
             alt={video.title}
             width={640}
             height={360}
-            className={`w-full h-full object-cover transform transition-transform duration-700 ${
+            className={`w-full h-full object-cover rounded-xl transform transition-transform duration-700 ${
               isHovered ? "scale-110" : "scale-100"
             }`}
           />
@@ -96,10 +113,10 @@ const VideoCard = forwardRef<HTMLDivElement, VideoCardProps>(
           </div>
 
           {/* Views badge */}
-          <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded flex items-center z-20">
+          {/* <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded flex items-center z-20">
             <Clock size={10} className="mr-1" />
             {viewCount} views
-          </div>
+          </div> */}
 
           {/* Save button - updated to show "Saved" status */}
           <button
@@ -125,7 +142,7 @@ const VideoCard = forwardRef<HTMLDivElement, VideoCardProps>(
           </button>
         </Link>
 
-        <div className="p-3 pb-4">
+        <div className="p-3 pb-4 dark:bg-black">
           <div className="flex">
             {/* Channel avatar - visible only if we have owner data */}
             {owner && (
@@ -150,17 +167,15 @@ const VideoCard = forwardRef<HTMLDivElement, VideoCardProps>(
                 </h3>
               </Link>
 
-              {owner && (
-                <Link
-                  href={`/channel/${owner.username}`}
-                  className="text-xs text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mt-1 block"
-                >
-                  {owner.fullname || owner.username}
-                </Link>
-              )}
+              <Link
+                href={`/channel/${username}`}
+                className="text-xs text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mt-1 block"
+              >
+                {displayName}
+              </Link>
 
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {timeAgo}
+                {timeAgo} • {viewCount} views
               </p>
             </div>
           </div>

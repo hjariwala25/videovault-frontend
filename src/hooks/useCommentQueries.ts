@@ -1,63 +1,88 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '@/services/api';
-import { queryKeys } from '@/lib/queryKeys';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import api from "@/services/api";
+import { queryKeys } from "@/lib/queryKeys";
 
-// Get video comments
-export function useVideoComments(videoId: string, page = 1, limit = 10) {
+// Get video comments 
+export function useVideoComments(videoId: string) {
   return useQuery({
-    queryKey: queryKeys.comments.list(videoId, page),
+    queryKey: queryKeys.comments.list(videoId),
     queryFn: async () => {
-      const response = await api.get(`/comments/${videoId}`, {
-        params: { page, limit }
-      });
-      return response.data.data;
+      const response = await api.get(`/comments/${videoId}`);
+
+      return response.data.data.docs;
     },
     enabled: !!videoId,
+    refetchOnWindowFocus: false,
   });
 }
 
-// Add comment
+// Add comment 
 export function useAddComment() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async ({ videoId, content }: { videoId: string; content: string }) => {
+    mutationFn: async ({
+      videoId,
+      content,
+    }: {
+      videoId: string;
+      content: string;
+    }) => {
       const response = await api.post(`/comments/${videoId}`, { content });
-      return response.data.data;
+      return { ...response.data.data, videoId };
     },
-    onSuccess: (_, { videoId }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.comments.list(videoId) });
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.comments.list(data.videoId),
+      });
     },
   });
 }
 
-// Update comment
+// Update comment 
 export function useUpdateComment() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async ({ commentId, content, videoId }: { commentId: string; content: string; videoId: string }) => {
+    mutationFn: async ({
+      commentId,
+      content,
+      videoId,
+    }: {
+      commentId: string;
+      content: string;
+      videoId: string;
+    }) => {
       const response = await api.patch(`/comments/c/${commentId}`, { content });
       return { ...response.data.data, videoId };
     },
     onSuccess: (data) => {
-      // With videoId provided, we can now target just the specific video's comments
-      queryClient.invalidateQueries({ queryKey: queryKeys.comments.list(data.videoId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.comments.list(data.videoId),
+      });
     },
   });
 }
 
-// Delete comment
+// Delete comment 
 export function useDeleteComment() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async ({ commentId, videoId }: { commentId: string; videoId: string }) => {
+    mutationFn: async ({
+      commentId,
+      videoId,
+    }: {
+      commentId: string;
+      videoId: string;
+    }) => {
       await api.delete(`/comments/c/${commentId}`);
       return { commentId, videoId };
     },
-    onSuccess: (_, { videoId }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.comments.list(videoId) });
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.comments.list(variables.videoId),
+      });
     },
   });
 }
