@@ -157,7 +157,7 @@ export default function Sidebar() {
                   alt={user.username}
                   width={40}
                   height={40}
-                  className="rounded-full h-10 w-10 border-2 border-white dark:border-gray-800 shadow-sm group-hover:border-blue-200 dark:group-hover:border-blue-800"
+                  className="rounded-full h-10 w-10 border-2 object-cover border-white dark:border-gray-800 shadow-sm group-hover:border-blue-200 dark:group-hover:border-blue-800"
                 />
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">

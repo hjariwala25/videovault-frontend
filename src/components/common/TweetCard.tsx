@@ -122,7 +122,7 @@ export default function TweetCard({
                 alt={owner.username || "User"}
                 width={40}
                 height={40}
-                className="rounded-full h-10 w-10 border-2 border-white dark:border-gray-800"
+                className="rounded-full h-10 w-10 border-2 object-cover border-white dark:border-gray-800"
               />
             </Link>
 

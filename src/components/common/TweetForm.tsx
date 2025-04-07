@@ -44,7 +44,7 @@ export default function TweetForm() {
           alt={currentUser?.username || "Your avatar"}
           width={40}
           height={40}
-          className="rounded-full h-10 w-10 border-2 border-white dark:border-gray-800"
+          className="rounded-full object-cover h-10 w-10 border-2 border-white dark:border-gray-800"
         />
 
         <div className="flex-1">

@@ -123,7 +123,7 @@ export default function Channel() {
     <MainLayout>
       <div className="max-w-7xl mx-auto px-4 py-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Cover Image */}
-        <div className="relative rounded-xl overflow-hidden bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 h-48 mb-16">
+        <div className="relative rounded-xl overflow-hidden bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 h-48 mb-6">
           {channel && channel.coverImage ? (
             <Image
               src={channel.coverImage}
@@ -136,44 +136,39 @@ export default function Channel() {
           ) : (
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-indigo-500/20"></div>
           )}
+        </div>
 
-          {/* Profile Image - Positioned to overlap */}
-          <div className="absolute -bottom-12 left-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
             <div className="relative">
               <Image
                 src={channel?.avatar || "/default-avatar.png"}
                 alt={channel?.username ?? "Username"}
-                width={100}
-                height={100}
-                className="rounded-full border-4 border-white dark:border-black shadow-md bg-white dark:bg-gray-800"
+                width={96}
+                height={96}
+                className="rounded-full border-2 h-40 w-40 object-cover border-white dark:border-gray-800 shadow-md bg-white dark:bg-gray-800"
               />
-              <div className="absolute -right-2 -bottom-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white">
-                <UserCheck size={16} />
-              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Channel Info */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {channel?.fullname || "User"}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              @{channel?.username || params.username || ""}
-            </p>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              <span className="font-medium text-gray-900 dark:text-white">
-                {channel?.subscriberCount || 0}
-              </span>{" "}
-              subscribers •
-               <span className="font-medium text-gray-900 dark:text-white">
-                {" "}
-                {videos.length || 0}
-              </span>{" "}
-              videos
-            </p>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {channel?.fullname || "User"}
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                @{channel?.username || params.username || ""}
+              </p>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                <span className="font-medium text-gray-900 dark:text-white">
+                  {channel?.subscriberCount || 0}
+                </span>{" "}
+                subscribers •
+                <span className="font-medium text-gray-900 dark:text-white">
+                  {" "}
+                  {videos.length || 0}
+                </span>{" "}
+                videos
+              </p>
+            </div>
           </div>
 
           {!isOwnChannel && (
