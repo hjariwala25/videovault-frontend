@@ -61,20 +61,20 @@ export function useLogin() {
 
 // Register user
 export function useRegister() {
-    return useMutation({
-      mutationFn: async (formData: FormData) => {
-        // if (process.env.NODE_ENV !== 'production') {
-        //   console.log('FormData entries:');
-        //   for (const pair of formData.entries()) {
-        //     console.log(pair[0], pair[1]);
-        //   }
-        // }
-        
-        const response = await api.post('/users/register', formData);
-        return response.data.data;
-      },
-    });
-  }
+  return useMutation({
+    mutationFn: async (formData: FormData) => {
+      // if (process.env.NODE_ENV !== 'production') {
+      //   console.log('FormData entries:');
+      //   for (const pair of formData.entries()) {
+      //     console.log(pair[0], pair[1]);
+      //   }
+      // }
+
+      const response = await api.post("/users/register", formData);
+      return response.data.data;
+    },
+  });
+}
 
 // Logout user
 export function useLogout() {
@@ -115,11 +115,15 @@ export function useUpdateAvatar() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append("avatar", file);
-      const response = await api.patch("/users/avatar", formData);
-      return response.data.data;
+      const response = await api.patch("/users/avatar", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(queryKeys.user.current(), data);
+      queryClient.setQueryData(queryKeys.user.current(), data.data);
     },
   });
 }
@@ -132,11 +136,15 @@ export function useUpdateCoverImage() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append("coverImage", file);
-      const response = await api.patch("/users/cover-image", formData);
-      return response.data.data;
+      const response = await api.patch("/users/cover-image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(queryKeys.user.current(), data);
+      queryClient.setQueryData(queryKeys.user.current(), data.data);
     },
   });
 }
