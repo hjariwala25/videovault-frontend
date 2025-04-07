@@ -5,7 +5,7 @@ import { useVideoById } from "@/hooks/useVideoQueries";
 import { useToggleVideoLike } from "@/hooks/useLikeQueries";
 import { useVideoComments, useAddComment } from "@/hooks/useCommentQueries";
 import { useCurrentUser } from "@/hooks/useUserQueries";
-import { useToggleSubscription } from "@/hooks/useSubscriptionQueries"; 
+import { useToggleSubscription } from "@/hooks/useSubscriptionQueries";
 import Comment from "@/components/common/Comment";
 import CommentForm from "@/components/common/CommentForm";
 import MainLayout from "@/components/layout/MainLayout";
@@ -21,7 +21,7 @@ import {
   MessageSquare,
   ThumbsUp,
   ThumbsDown,
-} from "lucide-react"; 
+} from "lucide-react";
 import { formatTimeAgo, formatCount } from "@/utils/formatTime";
 import VideoActions from "@/components/video/VideoActions";
 import { useUserPlaylists } from "@/hooks/usePlaylistQueries";
@@ -54,7 +54,7 @@ export default function VideoPage() {
   useEffect(() => {
     if (!userPlaylists || !videoId) return;
 
-    // Reset the states 
+    // Reset the states
     setIsInPlaylist(false);
     setPlaylistId(null);
 
@@ -153,11 +153,26 @@ export default function VideoPage() {
     <MainLayout>
       <div className="p-4 max-w-4xl mx-auto">
         <video
-          src={video.videoFile}
           controls
           className="w-full rounded-lg"
           poster={video.thumbnail}
-        />
+          crossOrigin="anonymous"
+        >
+          <source
+            src={video.videoFile
+              .split("/upload/")
+              .join("/upload/q_auto,f_auto/")}
+            type="video/mp4"
+          />
+          <source
+            src={video.videoFile
+              .replace(".mp4", ".webm")
+              .split("/upload/")
+              .join("/upload/q_auto,f_auto/")}
+            type="video/webm"
+          />
+          Your browser doesn&apos;t support HTML5 video.
+        </video>
 
         {/* Title and like button in same row */}
         <div className="flex justify-between items-center mt-4">
@@ -335,12 +350,7 @@ export default function VideoPage() {
 
           {currentUser ? (
             <CommentForm
-              onSubmit={(content) =>
-                addComment.mutate(
-                  { videoId, content },
-                  
-                )
-              }
+              onSubmit={(content) => addComment.mutate({ videoId, content })}
               isSubmitting={addComment.isPending}
             />
           ) : (

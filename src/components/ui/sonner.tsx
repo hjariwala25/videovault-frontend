@@ -2,6 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, ToasterProps } from "sonner";
+import { CheckCircle, XCircle, Info, Loader2 } from "lucide-react";
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme();
@@ -11,25 +12,45 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       position="top-right"
-      richColors
+      richColors={false}
       closeButton
-      duration={4000}
+      duration={3000}
       expand={false}
+      icons={{
+        success: <CheckCircle className="h-5 w-5" />,
+        error: <XCircle className="h-5 w-5" />,
+        loading: <Loader2 className="h-5 w-5 animate-spin" />,
+        info: <Info className="h-5 w-5" />,
+      }}
       toastOptions={{
         style: {
-          border: "1px solid var(--border)",
-          borderRadius: "0.5rem",
+          border: "none",
+          borderRadius: "16px",
+          padding: "16px",
+          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.12)",
+          fontWeight: "500",
+          maxWidth: "320px",
+          marginTop: "28px",
         },
         classNames: {
           success:
-            "group border-green-500 dark:border-green-600 bg-green-50 dark:bg-green-950/30 text-green-800 dark:text-green-300",
+            "bg-green-500 text-white animate-in fade-in-50 duration-300",
           error:
-            "group border-red-500 dark:border-red-600 bg-red-50 dark:bg-red-950/30 text-red-800 dark:text-red-300",
+            "bg-red-500 text-white animate-in fade-in-50 duration-300",
           loading:
-            "group border-blue-500 dark:border-blue-600 bg-blue-50 dark:bg-blue-950/30 text-blue-800 dark:text-blue-300",
-          info: "group border-indigo-500 dark:border-indigo-600 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-800 dark:text-indigo-300",
+            "bg-blue-500 text-white animate-in fade-in-50 duration-300",
+          info: 
+            "bg-indigo-500 text-white animate-in fade-in-50 duration-300",
           default:
-            "group border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100",
+            "bg-gray-900 text-white dark:bg-gray-800 animate-in fade-in-50 duration-300",
+          description: 
+            "text-sm opacity-90 font-normal mt-1",
+          title:
+            "font-medium text-base flex items-center gap-2",
+          actionButton:
+            "bg-white/20 hover:bg-white/30 text-white rounded-full px-3 py-1 text-sm transition-colors",
+          cancelButton:
+            "text-white/80 hover:text-white text-sm",
         },
       }}
       {...props}
