@@ -63,51 +63,98 @@ export default function Header() {
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
             <Link href="/" className="flex items-center group">
-              <svg viewBox="0 0 24 24" className="h-8 w-8 mr-2">
-                <defs>
-                  <linearGradient
-                    id="circleGrad"
-                    x1="0%"
-                    y1="0%"
-                    x2="100%"
-                    y2="100%"
-                  >
-                    <stop
-                      offset="0%"
-                      style={{ stopColor: "#3b82f6", stopOpacity: 1 }}
-                    />
-                    <stop
-                      offset="100%"
-                      style={{ stopColor: "#9333ea", stopOpacity: 1 }}
-                    />
-                  </linearGradient>
-                  <linearGradient
-                    id="playGrad"
-                    x1="0%"
-                    y1="0%"
-                    x2="100%"
-                    y2="0%"
-                  >
-                    <stop
-                      offset="0%"
-                      style={{ stopColor: "#ffffff", stopOpacity: 1 }}
-                    />
-                    <stop
-                      offset="100%"
-                      style={{ stopColor: "#e5e7eb", stopOpacity: 1 }}
-                    />
-                  </linearGradient>
-                </defs>
-                <path
-                  fill="url(#circleGrad)"
-                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
-                />
-                <path
-                  fill="url(#playGrad)"
-                  d="M10 7.5L16 12L10 16.5Z"
-                  transform="rotate(5 12 12)"
-                />
-              </svg>
+<svg viewBox="0 0 48 48" className="h-12 w-12">
+  <defs>
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style={{ stopColor: "#2563eb", stopOpacity: 1 }} /> {/* blue-600 */}
+      <stop offset="100%" style={{ stopColor: "#4f46e5", stopOpacity: 1 }} /> {/* indigo-600 */}
+    </linearGradient>
+    
+    <linearGradient id="screenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style={{ stopColor: "#1e40af", stopOpacity: 0.1 }} /> {/* blue-800 */}
+      <stop offset="100%" style={{ stopColor: "#3730a3", stopOpacity: 0.1 }} /> {/* indigo-800 */}
+    </linearGradient>
+    
+    <linearGradient id="playGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style={{ stopColor: "#ffffff", stopOpacity: 1 }} />
+      <stop offset="100%" style={{ stopColor: "#f0f9ff", stopOpacity: 0.9 }} />
+    </linearGradient>
+    
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0.6" dy="1" stdDeviation="1" floodOpacity="0.3" />
+    </filter>
+    
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <pattern id="noisePattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <rect width="100" height="100" fill="#ffffff" opacity="0.03" />
+      <rect width="25" height="25" fill="#ffffff" opacity="0.05" />
+      <rect x="25" y="25" width="25" height="25" fill="#ffffff" opacity="0.05" />
+      <rect x="50" y="50" width="25" height="25" fill="#ffffff" opacity="0.05" />
+      <rect x="75" y="75" width="25" height="25" fill="#ffffff" opacity="0.05" />
+    </pattern>
+  </defs>
+  
+  {/* Main vault/screen shape - border removed */}
+  <rect 
+    x="6" 
+    y="8" 
+    width="36" 
+    height="26" 
+    rx="4" 
+    ry="4" 
+    fill="url(#mainGradient)" 
+    filter="url(#dropShadow)"
+    stroke="none"
+  />
+  
+  {/* Screen texture */}
+  <rect 
+    x="6" 
+    y="8" 
+    width="36" 
+    height="26" 
+    rx="4" 
+    ry="4" 
+    fill="url(#noisePattern)" 
+  />
+  
+  {/* Video screen */}
+  <rect 
+    x="10" 
+    y="12" 
+    width="28" 
+    height="16" 
+    rx="2" 
+    ry="2" 
+    fill="url(#screenGradient)" 
+    stroke="#ffffff"
+    strokeWidth="0.8"
+    strokeOpacity="0.3"
+  />
+  
+  {/* Play button */}
+  <path 
+    d="M20,16 L28,20 L20,24 Z" 
+    fill="url(#playGradient)"
+    filter="url(#glow)"
+  />
+  
+  {/* Control bar */}
+  <rect 
+    x="14" 
+    y="30" 
+    width="20" 
+    height="2" 
+    rx="1" 
+    ry="1" 
+    fill="#ffffff" 
+    opacity="0.7"
+  />
+</svg>
               <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 text-xl hidden sm:inline group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-300">
                 VideoVault
               </span>
