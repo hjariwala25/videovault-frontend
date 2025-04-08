@@ -253,6 +253,23 @@ export default function PlaylistPage() {
     0
   );
 
+  // Generate gradient based on playlist name
+  const playlistName = playlist?.playlist?.name || playlist?.name || "Untitled";
+  const colorIndex = (playlistName.length + playlistId.length) % 6;
+  const gradients = [
+    "from-blue-600 to-indigo-600",
+    "from-purple-600 to-pink-600",
+    "from-indigo-600 to-blue-500",
+    "from-blue-500 to-cyan-500",
+    "from-cyan-500 to-teal-500",
+    "from-violet-600 to-purple-600",
+  ];
+  const gradient = gradients[colorIndex];
+
+  // Check if thumbnail is default or missing
+  const hasValidThumbnail =
+    thumbnailImage && thumbnailImage !== "/default-thumbnail.png";
+
   return (
     <MainLayout>
       <div className="max-w-7xl mx-auto px-4 py-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -262,14 +279,28 @@ export default function PlaylistPage() {
             {/* Cover Image */}
             <div className="relative h-48 sm:h-64 overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent z-10"></div>
-              <Image
-                src={thumbnailImage}
-                alt={playlist?.name || "Playlist"}
-                width={1200}
-                height={400}
-                className="w-full h-full object-cover"
-                priority
-              />
+              {hasValidThumbnail ? (
+                <Image
+                  src={thumbnailImage}
+                  alt={playlist?.name || "Playlist"}
+                  width={1200}
+                  height={400}
+                  className="w-full h-full object-cover"
+                  priority
+                />
+              ) : (
+                <div
+                  className={`w-full h-full bg-gradient-to-r ${gradient} relative flex items-center justify-center`}
+                >
+                  <div
+                    className="absolute inset-0 opacity-10"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E")`,
+                    }}
+                  ></div>
+                  <ListVideo className="w-24 h-24 text-white/70" />
+                </div>
+              )}
               <div className="absolute bottom-0 left-0 right-0 z-20 p-6 sm:p-8">
                 <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 text-shadow-sm">
                   {/* Handle the nested structure correctly */}

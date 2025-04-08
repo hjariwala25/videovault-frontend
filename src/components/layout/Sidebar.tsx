@@ -6,9 +6,10 @@ import {
   Home,
   Users,
   Clock,
-  PlaySquare,
+  ListVideo,
   MessageSquare,
   ThumbsUp,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentUser } from "@/hooks/useUserQueries";
@@ -37,7 +38,7 @@ export default function Sidebar() {
     {
       name: "Playlists",
       href: "/playlists",
-      icon: PlaySquare,
+      icon: ListVideo,
       requiresAuth: true,
     },
     {
@@ -52,6 +53,12 @@ export default function Sidebar() {
       icon: MessageSquare,
       requiresAuth: true,
     },
+    {
+      name: "Settings",
+      href: "/settings",
+      icon: Settings,
+      requiresAuth: true,
+    }
   ];
 
   return (
@@ -103,7 +110,7 @@ export default function Sidebar() {
           )}
         </button>
 
-        <div className="space-y-1 pt-2">
+        <div className="space-y-0 pt-1">
           {navItems.map((item) => {
             // Skip auth-required items if user is not logged in
             if (item.requiresAuth && !user) return null;
