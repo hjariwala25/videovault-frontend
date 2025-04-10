@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Link from "next/link";
-import { TvMinimalPlay, UserRound, KeyRound, ArrowRight } from "lucide-react";
+import { UserRound, KeyRound, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import VideoVaultLogo from "@/components/common/VideoVaultLogo";
 
 export default function Login() {
   const [credentials, setCredentials] = useState({
@@ -51,8 +52,8 @@ export default function Login() {
         <div className="w-full max-w-md mx-auto lg:max-w-lg">
           <div className="mb-10 flex flex-col items-center lg:items-start">
             <Link href="/" className="flex items-center mb-6">
-              <div className="rounded-xl bg-blue-600 p-2 mr-2">
-                <TvMinimalPlay className="h-6 w-6 text-white" />
+              <div className="mr-2">
+                <VideoVaultLogo size={40} />
               </div>
               <span className="text-2xl font-bold text-gray-900 dark:text-white">
                 VideoVault
@@ -111,7 +112,6 @@ export default function Login() {
                   >
                     Password
                   </Label>
-                    
                 </div>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -213,7 +213,6 @@ export default function Login() {
                 </Button>
               </div>
             </form>
-
           </div>
         </div>
       </div>
@@ -224,9 +223,7 @@ export default function Login() {
         <div className="absolute inset-0 flex flex-col items-center justify-center p-16">
           <div className="w-full max-w-md text-center">
             <div className="flex justify-center mb-8">
-              <div className="rounded-2xl bg-white/10 backdrop-blur-sm p-4 shadow-2xl">
-                <TvMinimalPlay className="h-12 w-12 text-white" />
-              </div>
+              <VideoVaultLogo size={100} />
             </div>
             <h1 className="text-4xl font-extrabold tracking-tight text-white mb-6">
               Welcome back to VideoVault
@@ -235,7 +232,6 @@ export default function Login() {
               The best platform to share, discover, and engage with videos that
               matter to you.
             </p>
-
           </div>
         </div>
       </div>
