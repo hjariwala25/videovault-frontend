@@ -69,7 +69,7 @@ export default function Login() {
                 href="/register"
                 className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
               >
-                Sign up
+                Sign up →
               </Link>
             </p>
           </div>

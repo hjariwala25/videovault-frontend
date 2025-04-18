@@ -503,7 +503,7 @@ export default function Register() {
                     href="/login"
                     className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
                   >
-                    Sign in
+                    Sign in →
                   </Link>
                 </p>
 
