@@ -39,7 +39,11 @@ export default function Login() {
             err?.response?.data?.message || "Please check your credentials"
           }`,
       });
-      router.push("/");
+
+      // setTimeout(() => {
+        router.push("/");
+      //   router.refresh();
+      // }, 300);
     } catch (error) {
       console.error("Login failed:", error);
     }

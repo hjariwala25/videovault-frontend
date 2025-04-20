@@ -22,13 +22,14 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { useCurrentUser } from "@/hooks/useUserQueries";
+import { useCurrentUser, useLogout } from "@/hooks/useUserQueries";
 import SearchBar from "@/components/common/SearchBar";
 import VideoVaultLogo from "@/components/common/VideoVaultLogo";
 
 export default function Header() {
   const router = useRouter();
   const { data: user } = useCurrentUser();
+  const logout = useLogout();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -43,6 +44,15 @@ export default function Header() {
 
   const handleSearchComplete = () => {
     setMobileMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout.mutateAsync();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
@@ -64,12 +74,11 @@ export default function Header() {
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
             <Link href="/" className="flex items-center group">
-            <VideoVaultLogo size={40} className="mr-2" />
-            <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 text-xl hidden sm:inline group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-300">
+              <VideoVaultLogo size={40} className="mr-2" />
+              <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 text-xl hidden sm:inline group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-300">
                 VideoVault
               </span>
             </Link>
-              
           </div>
 
           {/* Desktop Search Bar */}
@@ -144,7 +153,7 @@ export default function Header() {
                     <DropdownMenuSeparator className="my-1 bg-gray-200 dark:bg-gray-800" />
 
                     <DropdownMenuItem
-                      onClick={() => router.push("/auth/logout")}
+                      onClick={handleLogout}
                       className="rounded-lg py-2 my-1 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-400"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
