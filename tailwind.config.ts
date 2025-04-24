@@ -9,6 +9,16 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        'xs': '375px',
+        'sm': '640px',
+        'md': '768px',
+        'tablet': '834px',  // iPad screen width
+        'lg': '1024px',
+        'ipad': '1024px',   // iPad Air/Pro breakpoint
+        'xl': '1280px',
+        '2xl': '1536px',
+      },
       colors: {
         border: "rgb(var(--border))",
         input: "rgb(var(--input))",

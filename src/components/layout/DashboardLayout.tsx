@@ -10,6 +10,9 @@ import {
   Upload,
   ChevronLeft,
   ChevronRight,
+  Home,
+  MoreHorizontal,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +23,7 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isActive = (path: string) => {
     if (path === "/dashboard") {
@@ -31,6 +35,15 @@ export default function DashboardLayout({
   };
 
   const navItems = [
+    { href: "/", label: "Home", icon: Home },
+    { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+    { href: "/dashboard/videos", label: "Videos", icon: Film },
+    { href: "/dashboard/upload", label: "Upload", icon: Upload },
+  ];
+
+  // Use all items for bottom navigation in dashboard
+  const mobileNavItems = [
+    { href: "/", label: "Home", icon: Home },
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
     { href: "/dashboard/videos", label: "Videos", icon: Film },
     { href: "/dashboard/upload", label: "Upload", icon: Upload },
@@ -41,7 +54,7 @@ export default function DashboardLayout({
       <Header />
 
       <div className="flex flex-1 pt-16">
-        {/* Dashboard Sidebar */}
+        {/* Desktop Dashboard Sidebar */}
         <aside
           className={cn(
             "fixed left-0 top-16 h-[calc(100vh-4rem)] z-30 transition-all duration-300 ease-in-out",
@@ -70,10 +83,6 @@ export default function DashboardLayout({
             </button>
 
             <div className="space-y-1.5 pt-2">
-              
-               
-              
-
               {navItems.map((item) => (
                 <Link
                   key={item.label}
@@ -108,6 +117,46 @@ export default function DashboardLayout({
             </div>
           </div>
         </aside>
+
+        {/* Mobile Sidebar Overlay */}
+        {sidebarOpen && (
+          <div
+            className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-30 transition-all duration-300 animate-in fade-in"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Mobile Bottom Navigation */}
+        <div className="md:hidden fixed bottom-0 inset-x-0 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800 flex justify-around items-center h-16 z-20 px-2 bottom-nav fixed-bottom">
+          {mobileNavItems.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="flex flex-col items-center py-2 px-1"
+            >
+              <div
+                className={cn(
+                  "flex items-center justify-center w-10 h-10 rounded-xl mb-1",
+                  isActive(item.href)
+                    ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    : "text-gray-500 dark:text-gray-400"
+                )}
+              >
+                <item.icon
+                  className={cn(
+                    "h-5 w-5",
+                    isActive(item.href)
+                      ? "text-blue-600 dark:text-blue-400"
+                      : "text-gray-500 dark:text-gray-400"
+                  )}
+                />
+              </div>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                {item.label}
+              </span>
+            </Link>
+          ))}
+        </div>
 
         {/* Main Content */}
         <main

@@ -203,3 +203,82 @@
     @apply dark:bg-black/90 dark:backdrop-blur-md;
   }
 }
+
+/* Responsive Styles */
+@media (max-width: 640px) {
+  /* Mobile styles */
+  html, body {
+    overflow-x: hidden;
+  }
+  
+  /* Add extra space at bottom for fixed navigation */
+  main {
+    padding-bottom: 5rem !important;
+  }
+
+  /* Adjust font sizes for mobile */
+  h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  h2 {
+    font-size: 1.25rem !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  /* Tablet styles */
+  main {
+    padding-bottom: 5rem !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* iPad styles */
+  .sidebar-container {
+    width: 3.5rem;
+  }
+  
+  .with-sidebar {
+    margin-left: 3.5rem;
+  }
+}
+
+/* Ensure elements don't overflow viewport */
+.max-h-mobile {
+  max-height: calc(100vh - 80px) !important;
+}
+
+/* Bottom navigation styling */
+.bottom-nav {
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+
+/* Support for iPad and other tablets in landscape mode */
+@media (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) {
+  .container {
+    max-width: 1024px !important;
+  }
+}
+
+/* Fix for iPhone safe areas */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .fixed-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .pb-safe {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* Add additional padding for notched devices */
+@media (display-mode: standalone) {
+  .app-header {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+  
+  .app-footer {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+}

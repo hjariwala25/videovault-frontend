@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-import { Menu, X, ArrowUp } from "lucide-react";
+import { Menu, X, ArrowUp, MoreHorizontal } from "lucide-react";
 
 export default function MainLayout({
   children,
@@ -38,19 +38,9 @@ export default function MainLayout({
 
       <div className="flex flex-1">
         {/* Desktop Sidebar */}
-        <Sidebar />
-
-        {/* Mobile Sidebar Toggle */}
-        <button
-          className="md:hidden fixed bottom-6 left-6 z-20 p-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg backdrop-blur-sm hover:scale-105 transition-all duration-300"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-        >
-          {sidebarOpen ? (
-            <X size={24} className="animate-in fade-in duration-200" />
-          ) : (
-            <Menu size={24} className="animate-in fade-in duration-200" />
-          )}
-        </button>
+        <div className="hidden md:block">
+          <Sidebar />
+        </div>
 
         {/* Mobile Sidebar Overlay */}
         {sidebarOpen && (
@@ -60,17 +50,46 @@ export default function MainLayout({
           />
         )}
 
-        {/* Mobile Sidebar */}
+        {/* Mobile Sidebar - Full slide-up panel */}
         <div
-          className={`md:hidden fixed inset-y-0 left-0 w-64 bg-white dark:bg-black shadow-2xl dark:shadow-[#333]/20 z-40 overflow-y-auto transform transition-all duration-300 ease-out ${
-            sidebarOpen ? "translate-x-0 rounded-r-2xl" : "-translate-x-full"
+          className={`md:hidden fixed inset-x-0 bottom-0 bg-white dark:bg-black shadow-2xl dark:shadow-[#333]/20 z-40 overflow-y-auto transform transition-all duration-300 ease-out rounded-t-2xl ${
+            sidebarOpen 
+              ? "translate-y-0 max-h-[50vh]" 
+              : "translate-y-full"
           }`}
         >
-          <Sidebar />
+          <div className="p-4 max-h-[50vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">More Options</h3>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <Sidebar moreOverlay={true} />
+          </div>
+        </div>
+
+        {/* Mobile Bottom Navigation Bar - Always visible */}
+        <div className="md:hidden fixed bottom-0 inset-x-0 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800 flex justify-around items-center h-16 z-20 px-2 bottom-nav fixed-bottom">
+          <Sidebar mobileBottomNav={true} />
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="flex flex-col items-center py-2 px-1"
+          >
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl mb-1 text-gray-500 dark:text-gray-400">
+              {sidebarOpen ? <X size={20} /> : <MoreHorizontal size={20} />}
+            </div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+              More
+            </span>
+          </button>
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 p-4 max-w-7xl mx-auto w-full pb-24 text-gray-900 dark:text-gray-100">
+        <main className="flex-1 p-4 max-w-7xl mx-auto w-full pb-24 md:pb-16 text-gray-900 dark:text-gray-100 pb-safe">
           <div className="transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-bottom-4">
             {children}
           </div>
@@ -80,7 +99,7 @@ export default function MainLayout({
       {/* Scroll to top button */}
       <button
         onClick={scrollToTop}
-        className={`fixed bottom-6 right-6 z-20 p-3 rounded-full bg-white dark:bg-black text-blue-600 shadow-lg hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 backdrop-blur-sm hover:scale-105 ${
+        className={`fixed bottom-20 right-6 z-20 p-3 rounded-full bg-white dark:bg-black text-blue-600 shadow-lg hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 backdrop-blur-sm hover:scale-105 ${
           showScrollTop
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-10 pointer-events-none"
@@ -90,7 +109,7 @@ export default function MainLayout({
       </button>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-black border-t border-gray-100 dark:border-gray-800 mt-auto">
+      <footer className="bg-white dark:bg-black border-t border-gray-100 dark:border-gray-800 mt-auto pb-16 md:pb-0 app-footer">
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 md:flex md:items-center md:justify-between">
           <div className="text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start text-blue-600 font-bold text-xl mb-3">
