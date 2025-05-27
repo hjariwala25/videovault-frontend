@@ -5,14 +5,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
-  Menu,
   X,
   Upload,
   User,
   LogOut,
   Settings,
   LayoutDashboard,
-  Search,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Button } from "@/components/ui/button";
@@ -33,7 +31,6 @@ export default function Header() {
   const logout = useLogout();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,7 +43,6 @@ export default function Header() {
 
   const handleSearchComplete = () => {
     setMobileMenuOpen(false);
-    setSearchOpen(false);
   };
 
   const handleLogout = async () => {
@@ -68,14 +64,8 @@ export default function Header() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
-          {/* Logo and mobile menu button */}
-          <div className="flex items-center">
-            <button
-              className="inline-flex items-center justify-center mr-2 md:hidden text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+          {/* Left section: Logo and mobile menu button */}
+          <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="flex items-center group">
               <VideoVaultLogo size={32} className="mr-2" />
               <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 text-xl hidden sm:inline group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-300">
@@ -84,21 +74,17 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Desktop Search Bar */}
-          <div className={`hidden md:block w-full max-w-md mx-4`}>
-            <SearchBar placeholder="Search" onSearch={handleSearchComplete} />
+          {/* Center section: Search Bar (visible on all screen sizes) */}
+          <div className="flex-grow max-w-md mx-2 md:mx-4">
+            <SearchBar
+              placeholder="Search"
+              onSearch={handleSearchComplete}
+              className="w-full"
+            />
           </div>
 
-          {/* Mobile Search Toggle */}
-          <button 
-            className="md:hidden p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full"
-            onClick={() => setSearchOpen(!searchOpen)}
-          >
-            {searchOpen ? <X size={20} /> : <Search size={20} />}
-          </button>
-
-          {/* Navigation and profile */}
-          <div className="flex items-center space-x-1 sm:space-x-3">
+          {/* Right section: Navigation and profile */}
+          <div className="flex-shrink-0 flex items-center space-x-1 sm:space-x-3">
             <ThemeToggle />
             {user ? (
               <>
@@ -198,14 +184,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Search - always visible when search is open */}
-      <div className={`md:hidden px-4 py-2 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-black transition-all duration-300 ${searchOpen ? 'block' : 'hidden'}`}>
-        <SearchBar
-          placeholder="Search videos..."
-          onSearch={handleSearchComplete}
-        />
-      </div>
-
       {/* Mobile Menu - slides in from the side */}
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
@@ -220,21 +198,21 @@ export default function Header() {
               </button>
             </div>
             <div className="p-4">
-              <Link 
+              <Link
                 href="/"
                 className="block px-4 py-3 mb-1 text-lg font-medium text-gray-900 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Home
               </Link>
-              <Link 
+              <Link
                 href="/subscriptions"
                 className="block px-4 py-3 mb-1 text-lg font-medium text-gray-900 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Subscriptions
               </Link>
-              <Link 
+              <Link
                 href="/history"
                 className="block px-4 py-3 mb-1 text-lg font-medium text-gray-900 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                 onClick={() => setMobileMenuOpen(false)}
@@ -244,21 +222,21 @@ export default function Header() {
               {user && (
                 <>
                   <div className="h-px bg-gray-200 dark:bg-gray-800 my-4"></div>
-                  <Link 
+                  <Link
                     href="/dashboard"
                     className="block px-4 py-3 mb-1 text-lg font-medium text-gray-900 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Dashboard
                   </Link>
-                  <Link 
+                  <Link
                     href={`/channel/${user.username}`}
                     className="block px-4 py-3 mb-1 text-lg font-medium text-gray-900 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Your Channel
                   </Link>
-                  <Link 
+                  <Link
                     href="/settings"
                     className="block px-4 py-3 mb-1 text-lg font-medium text-gray-900 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                     onClick={() => setMobileMenuOpen(false)}
@@ -275,14 +253,17 @@ export default function Header() {
                       Login
                     </Button>
                   </Link>
-                  <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                  <Link
+                    href="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
                     <Button className="w-full rounded-full gradient-bg">
                       Sign Up
                     </Button>
                   </Link>
                 </div>
               ) : (
-                <Button 
+                <Button
                   variant="destructive"
                   className="w-full mt-4 rounded-full"
                   onClick={() => {

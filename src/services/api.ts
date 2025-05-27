@@ -42,7 +42,7 @@ api.interceptors.response.use(
           api.defaults.headers.common.Authorization = `Bearer ${res.data.data.accessToken}`;
           return api(originalRequest);
         }
-      } catch (err) {
+      } catch {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         window.location.href = '/login';
