@@ -11,6 +11,7 @@ import {
   LogOut,
   Settings,
   LayoutDashboard,
+  Search,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ export default function Header() {
   const logout = useLogout();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,6 +45,7 @@ export default function Header() {
 
   const handleSearchComplete = () => {
     setMobileMenuOpen(false);
+    setSearchExpanded(false);
   };
 
   const handleLogout = async () => {
@@ -52,6 +55,10 @@ export default function Header() {
     } catch (error) {
       console.error("Logout failed:", error);
     }
+  };
+
+  const toggleMobileSearch = () => {
+    setSearchExpanded(!searchExpanded);
   };
 
   return (
@@ -66,25 +73,69 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Left section: Logo and mobile menu button */}
           <div className="flex-shrink-0 flex items-center">
+            
             <Link href="/" className="flex items-center group">
-              <VideoVaultLogo size={32} className="mr-2" />
-              <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 text-xl hidden sm:inline group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-300">
+              <VideoVaultLogo size={28} className="mr-1.5" />
+              <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 text-sm sm:text-xl group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-300 max-w-[75px] sm:max-w-none truncate">
                 VideoVault
               </span>
             </Link>
           </div>
 
-          {/* Center section: Search Bar (visible on all screen sizes) */}
-          <div className="flex-grow max-w-md mx-2 md:mx-4">
-            <SearchBar
-              placeholder="Search"
-              onSearch={handleSearchComplete}
-              className="w-full"
-            />
+          {/* Search area - Different behavior for mobile and desktop */}
+          <div
+            className={`flex-grow max-w-md mx-2 md:mx-4 ${
+              searchExpanded ? "flex items-center" : ""
+            }`}
+          >
+            {/* Desktop search - always visible */}
+            <div className="hidden md:block w-full">
+              <SearchBar
+                placeholder="Search"
+                onSearch={handleSearchComplete}
+                className="w-full"
+              />
+            </div>
+
+            {/* Mobile search icon or expanded search */}
+            <div
+              className={`md:hidden flex items-center w-full ${
+                searchExpanded ? "justify-between" : "justify-end"
+              }`}
+            >
+              {searchExpanded ? (
+                <>
+                  <div className="flex-grow">
+                    <SearchBar
+                      placeholder="Search"
+                      onSearch={handleSearchComplete}
+                      className="w-full"
+                    />
+                  </div>
+                  <button
+                    onClick={toggleMobileSearch}
+                    className="ml-2 p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full"
+                  >
+                    <X size={20} />
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={toggleMobileSearch}
+                  className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full"
+                >
+                  <Search size={20} />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Right section: Navigation and profile */}
-          <div className="flex-shrink-0 flex items-center space-x-1 sm:space-x-3">
+          <div
+            className={`flex-shrink-0 flex items-center space-x-1 sm:space-x-3 ${
+              searchExpanded ? "hidden md:flex" : ""
+            }`}
+          >
             <ThemeToggle />
             {user ? (
               <>

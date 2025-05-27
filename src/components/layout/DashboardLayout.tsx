@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./Header";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,9 +12,11 @@ import {
   ChevronRight,
   Home,
   MoreHorizontal,
-  X
+  X,
+  ArrowUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Sidebar from "./Sidebar";
 
 export default function DashboardLayout({
   children,
@@ -24,6 +26,20 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Prevent hydration errors and track scroll position
+  useEffect(() => {
+    setIsClient(true);
+
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 500);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const isActive = (path: string) => {
     if (path === "/dashboard") {
@@ -34,31 +50,37 @@ export default function DashboardLayout({
     return pathname === path || pathname.startsWith(`${path}/`);
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  if (!isClient) return null;
+
   const navItems = [
-    { href: "/", label: "Home", icon: Home },
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
     { href: "/dashboard/videos", label: "Videos", icon: Film },
     { href: "/dashboard/upload", label: "Upload", icon: Upload },
+    { href: "/", label: "Home", icon: Home },
   ];
 
   // Use all items for bottom navigation in dashboard
   const mobileNavItems = [
-    { href: "/", label: "Home", icon: Home },
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
     { href: "/dashboard/videos", label: "Videos", icon: Film },
     { href: "/dashboard/upload", label: "Upload", icon: Upload },
+    { href: "/", label: "Home", icon: Home },
   ];
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-black">
       <Header />
 
-      <div className="flex flex-1 pt-16">
+      <div className="flex flex-1">
         {/* Desktop Dashboard Sidebar */}
         <aside
           className={cn(
-            "fixed left-0 top-16 h-[calc(100vh-4rem)] z-30 transition-all duration-300 ease-in-out",
-            "bg-white dark:bg-black border-gray-200 dark:border-gray-800",
+            "hidden md:block fixed left-0 top-16 h-[calc(100vh-4rem)] z-30 transition-all duration-300 ease-in-out",
+            "bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800",
             "overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-700",
             collapsed ? "w-20" : "w-64"
           )}
@@ -71,9 +93,9 @@ export default function DashboardLayout({
               {!collapsed ? (
                 <>
                   <span className="flex items-center group-hover:translate-x-[-2px] transition-transform">
-                  <h2 className="px-4 py-2 font-bold text-gray-900 dark:text-white text-lg">
-                  Dashboard
-                </h2>
+                    <h2 className="px-4 py-2 font-bold text-gray-900 dark:text-white text-lg">
+                      Dashboard
+                    </h2>
                   </span>
                   <ChevronLeft className="h-5 w-5" />
                 </>
@@ -126,46 +148,90 @@ export default function DashboardLayout({
           />
         )}
 
-        {/* Mobile Bottom Navigation */}
-        <div className="md:hidden fixed bottom-0 inset-x-0 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800 flex justify-around items-center h-16 z-20 px-2 bottom-nav fixed-bottom">
-          {mobileNavItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="flex flex-col items-center py-2 px-1"
-            >
-              <div
-                className={cn(
-                  "flex items-center justify-center w-10 h-10 rounded-xl mb-1",
-                  isActive(item.href)
-                    ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                    : "text-gray-500 dark:text-gray-400"
-                )}
+        {/* Mobile Sidebar - Full slide-up panel */}
+        <div
+          className={`md:hidden fixed inset-x-0 bottom-0 bg-white dark:bg-black shadow-2xl dark:shadow-[#333]/20 z-40 overflow-y-auto transform transition-all duration-300 ease-out rounded-t-2xl ${
+            sidebarOpen ? "translate-y-0 max-h-[50vh]" : "translate-y-full"
+          }`}
+        >
+          <div className="p-4 max-h-[50vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Dashboard Menu
+              </h3>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
-                <item.icon
-                  className={cn(
-                    "h-5 w-5",
-                    isActive(item.href)
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-gray-500 dark:text-gray-400"
-                  )}
-                />
-              </div>
-              <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-                {item.label}
-              </span>
-            </Link>
-          ))}
+                <X size={20} />
+              </button>
+            </div>
+            <Sidebar moreOverlay={true} isDashboard={true} />
+          </div>
         </div>
 
         {/* Main Content */}
-        <main
-          className={`flex-1 transition-all duration-300 p-6 ${
-            collapsed ? "ml-20" : "ml-64"
-          }`}
-        >
-          <div className="max-w-7xl mx-auto">{children}</div>
+        <main className="flex-1 p-4 max-w-7xl mx-auto w-full pb-24 md:pb-16 text-gray-900 dark:text-gray-100 pb-safe md:ml-20 lg:ml-64">
+          <div className="transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-bottom-4">
+            {children}
+          </div>
         </main>
+      </div>
+
+      {/* Scroll to top button */}
+      <button
+        onClick={scrollToTop}
+        className={`fixed bottom-20 right-6 z-20 p-3 rounded-full bg-white dark:bg-black text-blue-600 shadow-lg hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 backdrop-blur-sm hover:scale-105 ${
+          showScrollTop
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-10 pointer-events-none"
+        }`}
+      >
+        <ArrowUp size={20} strokeWidth={2.5} />
+      </button>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800 flex justify-around items-center h-16 z-20 px-2 bottom-nav fixed-bottom">
+        {mobileNavItems.map((item) => (
+          <Link
+            key={item.label}
+            href={item.href}
+            className="flex flex-col items-center py-2 px-1"
+          >
+            <div
+              className={cn(
+                "flex items-center justify-center w-10 h-10 rounded-xl mb-1",
+                isActive(item.href)
+                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                  : "text-gray-500 dark:text-gray-400"
+              )}
+            >
+              <item.icon
+                className={cn(
+                  "h-5 w-5",
+                  isActive(item.href)
+                    ? "text-blue-600 dark:text-blue-400"
+                    : "text-gray-500 dark:text-gray-400"
+                )}
+              />
+            </div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+              {item.label}
+            </span>
+          </Link>
+        ))}
+
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="flex flex-col items-center py-2 px-1"
+        >
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl mb-1 text-gray-500 dark:text-gray-400">
+            {sidebarOpen ? <X size={20} /> : <MoreHorizontal size={20} />}
+          </div>
+          <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+            More
+          </span>
+        </button>
       </div>
     </div>
   );
