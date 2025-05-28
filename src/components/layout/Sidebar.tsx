@@ -10,9 +10,6 @@ import {
   MessageSquare,
   ThumbsUp,
   Settings,
-  LayoutDashboard,
-  Film,
-  Upload,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentUser } from "@/hooks/useUserQueries";
@@ -26,7 +23,7 @@ interface SidebarProps {
   isDashboard?: boolean;
 }
 
-export default function Sidebar({ mobileView, mobileBottomNav, moreOverlay, isDashboard }: SidebarProps) {
+export default function Sidebar({ mobileView, mobileBottomNav, moreOverlay }: SidebarProps) {
   const pathname = usePathname();
   const { data: user } = useCurrentUser();
   const [expanded, setExpanded] = useState(true);
@@ -106,13 +103,6 @@ export default function Sidebar({ mobileView, mobileBottomNav, moreOverlay, isDa
     }
   ];
 
-  // Dashboard navigation items (handled in DashboardLayout.tsx)
-  const dashboardItems = [
-    { name: "Home", href: "/", icon: Home },
-    { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Videos", href: "/dashboard/videos", icon: Film },
-    { name: "Upload", href: "/dashboard/upload", icon: Upload },
-  ];
 
   if (mobileBottomNav) {
     return (

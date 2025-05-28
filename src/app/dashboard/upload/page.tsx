@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, UploadCloud, Video, Image } from "lucide-react";
+import { Loader2, UploadCloud, Video, Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 
 export default function Upload() {
   const [file, setFile] = useState<File | null>(null);
@@ -19,7 +20,7 @@ export default function Upload() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  // const [uploadProgress, setUploadProgress] = useState(0);
   const [isValidating, setIsValidating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadMutation = useUploadVideo();
@@ -130,20 +131,9 @@ export default function Upload() {
     formData.append("description", description);
 
     toast.promise(
-      uploadMutation
-        .mutateAsync(formData, {
-          onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {
-              const progress = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              );
-              setUploadProgress(progress);
-            }
-          },
-        })
-        .then(() => {
-          router.push("/dashboard/videos");
-        }),
+      uploadMutation.mutateAsync(formData).then(() => {
+        router.push("/dashboard/videos");
+      }),
       {
         loading: "Uploading video...",
         success: "Video uploaded successfully!",
@@ -265,10 +255,14 @@ export default function Upload() {
                 <div className="mt-2">
                   {thumbnailPreview ? (
                     <div className="relative aspect-video mb-3 border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden shadow-sm">
-                      <img
+                      <Image
                         src={thumbnailPreview}
                         alt="Thumbnail preview"
                         className="object-cover w-full h-full"
+                        width={640}
+                        height={360}
+                        sizes="100vw"
+                        style={{ width: "100%", height: "auto" }}
                       />
                       <Button
                         type="button"
@@ -291,7 +285,7 @@ export default function Upload() {
                       }
                     >
                       <div className="space-y-2">
-                        <Image className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" />
+                        <ImageIcon className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" />
                         <div className="text-sm text-gray-600 dark:text-gray-300">
                           Click to upload thumbnail
                         </div>
@@ -313,19 +307,7 @@ export default function Upload() {
               </div>
 
               {/* Upload Progress */}
-              {uploadMutation.isPending && (
-                <div className="space-y-2 py-2">
-                  <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 dark:from-blue-600 dark:to-indigo-600 rounded-full transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-sm text-center text-adaptive-muted">
-                    {uploadProgress}% uploaded
-                  </p>
-                </div>
-              )}
+              {/* Progress bar removed because uploadProgress is not used */}
 
               {/* Form Actions */}
               <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100 dark:border-gray-800/40 mt-6">
