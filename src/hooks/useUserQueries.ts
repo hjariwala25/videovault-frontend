@@ -11,7 +11,7 @@ export function useCurrentUser() {
       const response = await api.get("/users/current-user");
       return response.data.data;
     },
-    retry: false,
+    retry: 1,
   });
 }
 
@@ -52,8 +52,6 @@ export function useLogin() {
       return response.data.data;
     },
     onSuccess: (data) => {
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
       queryClient.setQueryData(queryKeys.user.current(), data.user);
     },
   });
@@ -63,13 +61,6 @@ export function useLogin() {
 export function useRegister() {
   return useMutation({
     mutationFn: async (formData: FormData) => {
-      // if (process.env.NODE_ENV !== 'production') {
-      //   console.log('FormData entries:');
-      //   for (const pair of formData.entries()) {
-      //     console.log(pair[0], pair[1]);
-      //   }
-      // }
-
       const response = await api.post("/users/register", formData);
       return response.data.data;
     },
@@ -85,8 +76,8 @@ export function useLogout() {
       await api.post("/users/logout");
     },
     onSuccess: () => {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+      // Clear any stored data
+      localStorage.removeItem("user");
       queryClient.resetQueries();
     },
   });

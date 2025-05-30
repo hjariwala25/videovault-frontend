@@ -31,21 +31,22 @@ export default function Login() {
     }
 
     try {
-      await toast.promise(loginMutation.mutateAsync(credentials), {
-        loading: "Logging in...",
-        success: "Login successful!",
-        error: (err) =>
-          `Login failed: ${
-            err?.response?.data?.message || "Please check your credentials"
-          }`,
-      });
+      await loginMutation.mutateAsync(credentials);
 
-      // setTimeout(() => {
-        router.push("/");
-      //   router.refresh();
-      // }, 300);
+      // Show success notification
+      toast.success("Login successful!");
+
+      // Navigate to home page
+      router.push("/");
     } catch (error) {
-      console.error("Login failed:", error);
+      let errorMessage = "Please check your credentials";
+      if (error && typeof error === "object" && "response" in error) {
+        const err = error as { response?: { data?: { message?: string } } };
+        if (err.response?.data?.message) {
+          errorMessage = err.response.data.message;
+        }
+      }
+      toast.error(`Login failed: ${errorMessage}`);
     }
   };
 
