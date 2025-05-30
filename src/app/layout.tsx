@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
+import Favicon from "@/components/common/Favicon";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -12,20 +13,20 @@ export const metadata = {
   title: "VideoVault",
   description: "A video streaming platform",
   viewport: {
-    width: 'device-width',
+    width: "device-width",
     initialScale: 1,
     maximumScale: 1,
     userScalable: true,
-    viewportFit: 'cover',
+    viewportFit: "cover",
   },
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
   ],
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
-    title: 'VideoVault',
+    statusBarStyle: "default",
+    title: "VideoVault",
   },
   formatDetection: {
     telephone: false,
@@ -43,6 +44,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <Favicon />
         <script
           dangerouslySetInnerHTML={{
             __html: `
