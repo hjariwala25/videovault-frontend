@@ -4,11 +4,11 @@ import { useSearchParams } from "next/navigation";
 import { useVideos } from "@/hooks/useVideoQueries";
 import VideoCard from "@/components/common/VideoCard";
 import MainLayout from "@/components/layout/MainLayout";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
 
@@ -134,10 +134,50 @@ export default function SearchPage() {
           </>
         ) : (
           <div className="text-center py-8">
-            <p className="text-adaptive-muted">No videos found for &quot;{query}&quot;</p>
+            <p className="text-adaptive-muted">
+              No videos found for &quot;{query}&quot;
+            </p>
           </div>
         )}
       </div>
     </MainLayout>
+  );
+}
+
+// Add a loading state for the Suspense boundary
+function SearchLoading() {
+  return (
+    <MainLayout>
+      <div className="p-4">
+        <Skeleton className="h-8 w-40 mb-6" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array(6)
+            .fill(0)
+            .map((_, i) => (
+              <div
+                key={i}
+                className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm"
+              >
+                <Skeleton className="w-full aspect-video" />
+                <div className="p-4">
+                  <Skeleton className="h-5 w-full mb-2" />
+                  <div className="flex items-center mt-2">
+                    <Skeleton className="h-8 w-8 rounded-full mr-2" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
+      </div>
+    </MainLayout>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<SearchLoading />}>
+      <SearchContent />
+    </Suspense>
   );
 }
