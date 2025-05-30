@@ -174,6 +174,7 @@ function SearchLoading() {
   );
 }
 
+// Instead of directly exporting SearchContent, wrap it with Suspense
 export default function SearchPage() {
   return (
     <Suspense fallback={<SearchLoading />}>
