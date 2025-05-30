@@ -107,9 +107,8 @@ export default function Favicon() {
       const img = new Image();
 
       img.onload = () => {
-        // Fill background with a subtle color to make icon more visible
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, 512, 512);
+        // Create a transparent canvas
+        ctx.clearRect(0, 0, 512, 512);
 
         // Draw the image to the canvas
         ctx.drawImage(img, 0, 0);
@@ -133,9 +132,8 @@ export default function Favicon() {
           const sizeCtx = sizeCanvas.getContext("2d");
 
           if (sizeCtx) {
-            // Add white background for better visibility at small sizes
-            sizeCtx.fillStyle = "#ffffff";
-            sizeCtx.fillRect(0, 0, size, size);
+            // Clear canvas to make it transparent
+            sizeCtx.clearRect(0, 0, size, size);
 
             // Draw the image scaled to this size with antialiasing
             sizeCtx.imageSmoothingEnabled = true;
@@ -160,8 +158,6 @@ export default function Favicon() {
             }
           }
         });
-
-        console.log("Enhanced favicon generation complete with all effects");
       };
 
       // Handle errors
