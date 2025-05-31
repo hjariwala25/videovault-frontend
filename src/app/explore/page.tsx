@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,54 @@ type PaginationData = {
   hasPrevPage: boolean;
 };
 
-export default function ExplorePage() {
+// Loading component for Suspense fallback
+function ExploreLoading() {
+  return (
+    <MainLayout>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-10 w-full md:w-64" />
+        </div>
+
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Skeleton className="h-9 w-32" />
+          <Skeleton className="h-9 w-32" />
+          <Skeleton className="h-9 w-32" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array(6)
+            .fill(0)
+            .map((_, i) => (
+              <div
+                key={i}
+                className="bg-white dark:bg-black/40 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800"
+              >
+                <Skeleton className="w-full h-24" />
+                <div className="p-4">
+                  <div className="flex items-center">
+                    <Skeleton className="h-12 w-12 rounded-full mr-3" />
+                    <div>
+                      <Skeleton className="h-5 w-32 mb-1" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center mt-4">
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-9 w-24 rounded-md" />
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
+      </div>
+    </MainLayout>
+  );
+}
+
+// Main component that uses useSearchParams
+function ExploreContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { data: currentUser } = useCurrentUser();
@@ -214,7 +261,10 @@ export default function ExplorePage() {
   // Client-side rendering guard
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    if (search) {
+      setSearchQuery(search);
+    }
+  }, [search]);
 
   if (!isClient) return null;
 
@@ -477,5 +527,14 @@ export default function ExplorePage() {
         )}
       </div>
     </MainLayout>
+  );
+}
+
+// Export a wrapper component that uses Suspense
+export default function ExplorePage() {
+  return (
+    <Suspense fallback={<ExploreLoading />}>
+      <ExploreContent />
+    </Suspense>
   );
 }
