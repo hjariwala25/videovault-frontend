@@ -1,9 +1,15 @@
 import axios from "axios";
 import { toast } from "sonner";
 
+// Simple environment check
+const isProd = process.env.NODE_ENV === "production";
+console.log(`Running in ${isProd ? "PRODUCTION" : "DEVELOPMENT"} mode`);
+console.log(`API URL: ${process.env.NEXT_PUBLIC_API_URL}`);
+console.log(`Frontend URL: ${process.env.NEXT_PUBLIC_FRONTEND_URL}`);
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1",
-  withCredentials: true, 
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
   },
@@ -16,6 +22,15 @@ api.interceptors.request.use(
     } else {
       config.headers["Content-Type"] = "application/json";
     }
+
+    // Add debug info in development
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`${config.method?.toUpperCase()} ${config.url}`, {
+        withCredentials: config.withCredentials,
+        headers: config.headers,
+      });
+    }
+
     return config;
   },
   (error) => {
@@ -28,6 +43,15 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
+    // Enhanced error logging
+    if (process.env.NODE_ENV !== "production") {
+      console.error("API Error:", {
+        status: error.response?.status,
+        url: error.config?.url,
+        message: error.response?.data?.message || error.message,
+      });
+    }
+
     const originalRequest = error.config;
     const isRefreshRequest = originalRequest.url?.includes("refresh-token");
 
@@ -54,6 +78,10 @@ api.interceptors.response.use(
         );
 
         if (refreshResponse.status === 200) {
+          // Log success message in development
+          if (process.env.NODE_ENV !== "production") {
+            console.log("Token refreshed successfully");
+          }
           return api(originalRequest);
         }
       } catch {
@@ -64,6 +92,13 @@ api.interceptors.response.use(
           }, 1000);
         }
       }
+    }
+
+    // For network errors (common in mobile when offline)
+    if (!error.response && error.message.includes("Network Error")) {
+      toast.error(
+        "Network connection issue. Please check your internet connection."
+      );
     }
 
     return Promise.reject(error);
