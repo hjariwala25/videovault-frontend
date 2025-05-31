@@ -59,4 +59,10 @@ export const queryKeys = {
       period,
     ],
   },
+
+  // Discover related keys
+  discover: {
+    channels: (sort: string, page: number, limit: number, search: string) =>
+      ["discover", "channels", sort, page, limit, search] as const,
+  },
 };

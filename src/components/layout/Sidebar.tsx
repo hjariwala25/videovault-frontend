@@ -10,6 +10,7 @@ import {
   MessageSquare,
   ThumbsUp,
   Settings,
+  Compass,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentUser } from "@/hooks/useUserQueries";
@@ -23,7 +24,11 @@ interface SidebarProps {
   isDashboard?: boolean;
 }
 
-export default function Sidebar({ mobileView, mobileBottomNav, moreOverlay }: SidebarProps) {
+export default function Sidebar({
+  mobileView,
+  mobileBottomNav,
+  moreOverlay,
+}: SidebarProps) {
   const pathname = usePathname();
   const { data: user } = useCurrentUser();
   const [expanded, setExpanded] = useState(true);
@@ -40,6 +45,13 @@ export default function Sidebar({ mobileView, mobileBottomNav, moreOverlay }: Si
       href: "/subscriptions",
       icon: Users,
       requiresAuth: true,
+    },
+    // Add Explore/Discover as a new navigation item (available to everyone)
+    {
+      name: "Explore",
+      href: "/explore",
+      icon: Compass,
+      requiresAuth: false,
     },
     { name: "History", href: "/history", icon: Clock, requiresAuth: true },
     {
@@ -65,19 +77,31 @@ export default function Sidebar({ mobileView, mobileBottomNav, moreOverlay }: Si
       href: "/settings",
       icon: Settings,
       requiresAuth: true,
-    }
+    },
   ];
 
   // For main layout mobile bottom navigation (Home, Subscriptions, Playlists, Tweets)
+  // Also add Explore to mobile navigation
   const mobileNavItems = [
     { name: "Home", href: "/", icon: Home, requiresAuth: false },
+    {
+      name: "Explore",
+      href: "/explore",
+      icon: Compass,
+      requiresAuth: false,
+    },
     {
       name: "Subscriptions",
       href: "/subscriptions",
       icon: Users,
       requiresAuth: true,
     },
-    { name: "Playlists", href: "/playlists", icon: ListVideo, requiresAuth: true },
+    {
+      name: "Playlists",
+      href: "/playlists",
+      icon: ListVideo,
+      requiresAuth: true,
+    },
     {
       name: "Tweets",
       href: "/tweets",
@@ -100,9 +124,8 @@ export default function Sidebar({ mobileView, mobileBottomNav, moreOverlay }: Si
       href: "/settings",
       icon: Settings,
       requiresAuth: true,
-    }
+    },
   ];
-
 
   if (mobileBottomNav) {
     return (
@@ -238,7 +261,12 @@ export default function Sidebar({ mobileView, mobileBottomNav, moreOverlay }: Si
           </button>
         )}
 
-        <div className={cn("space-y-0 pt-1", mobileView && "grid grid-cols-2 gap-2")}>
+        <div
+          className={cn(
+            "space-y-0 pt-1",
+            mobileView && "grid grid-cols-2 gap-2"
+          )}
+        >
           {navItems.map((item) => {
             // Skip auth-required items if user is not logged in
             if (item.requiresAuth && !user) return null;
@@ -248,7 +276,7 @@ export default function Sidebar({ mobileView, mobileBottomNav, moreOverlay }: Si
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
+                  "flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
                   isActive(item.href)
                     ? "bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-indigo-900/20 text-blue-600 dark:text-blue-400 shadow-sm"
                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-blue-900/10 dark:hover:text-blue-300 hover:shadow-sm dark:hover:border-blue-800/30"
@@ -271,14 +299,16 @@ export default function Sidebar({ mobileView, mobileBottomNav, moreOverlay }: Si
                     )}
                   />
                 </div>
-                {(expanded || mobileView) && <span className="ml-3">{item.name}</span>}
+                {(expanded || mobileView) && (
+                  <span className="ml-3">{item.name}</span>
+                )}
               </Link>
             );
           })}
         </div>
 
         {(expanded || mobileView) && user && (
-          <div className="mt-auto pt-6 px-3">
+          <div className="mt-auto pt-1 px-3">
             <div className="border-t border-gray-200 dark:border-gray-800 pt-4 mt-4">
               <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
                 Your Channel
