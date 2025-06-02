@@ -5,8 +5,8 @@ import VideoCard from "@/components/common/VideoCard";
 import MainLayout from "@/components/layout/MainLayout";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Video } from "@/types";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2 } from "lucide-react";
+import VideoLoadingSkeleton from "@/components/common/VideoLoadingSkeleton";
+import LoadMore from "@/components/common/LoadMore";
 
 export default function Home() {
   const {
@@ -46,46 +46,19 @@ export default function Home() {
 
   useEffect(() => {
     setIsClient(true);
-    if (data) {
-      console.log("Videos data received:", data);
-    }
-  }, [data]);
+  }, []);
 
   if (!isClient) return null;
 
-  if (isLoading && !data)
+  if (isLoading && !data) {
     return (
       <MainLayout>
-        <div className="p-4">
-          <Skeleton className="h-8 w-40 mb-6" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array(6)
-              .fill(0)
-              .map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm"
-                >
-                  <Skeleton className="w-full aspect-video" />
-                  <div className="p-4">
-                    <Skeleton className="h-5 w-full mb-2" />
-                    <div className="flex items-center mt-2">
-                      <Skeleton className="h-8 w-8 rounded-full mr-2" />
-                      <Skeleton className="h-4 w-24" />
-                    </div>
-                    <div className="flex items-center justify-between mt-2 text-xs">
-                      <Skeleton className="h-3 w-16" />
-                      <Skeleton className="h-3 w-12" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
+        <VideoLoadingSkeleton count={6} />
       </MainLayout>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <MainLayout>
         <div className="text-center p-4 text-red-500">
@@ -93,6 +66,7 @@ export default function Home() {
         </div>
       </MainLayout>
     );
+  }
 
   return (
     <MainLayout>
@@ -113,22 +87,12 @@ export default function Home() {
             </div>
 
             {/* Loading indicator */}
-            <div
-              ref={loadMoreRef}
-              className="flex justify-center items-center py-8"
-            >
-              {isFetchingNextPage && (
-                <div className="flex items-center justify-center">
-                  <Loader2 className="h-6 w-6 animate-spin mr-2 text-blue-500" />
-                  <span className="text-adaptive-muted">
-                    Loading more videos...
-                  </span>
-                </div>
-              )}
-
-              {!hasNextPage && videos.length > 0 && (
-                <p className="text-adaptive-muted">No more videos to load</p>
-              )}
+            <div ref={loadMoreRef}>
+              <LoadMore
+                isFetchingNextPage={isFetchingNextPage}
+                hasNextPage={!!hasNextPage}
+                hasItems={videos.length > 0}
+              />
             </div>
           </>
         ) : (
