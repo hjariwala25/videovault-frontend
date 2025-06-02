@@ -117,3 +117,10 @@ export interface DashboardStats {
   totalViews: number;
   totalVideos: number;
 }
+
+export interface SubscriptionMutation {
+  mutate: (channelId: string, options?: Record<string, unknown>) => void;
+  isPending: boolean;
+  isError: boolean;
+  isSuccess: boolean;
+}
