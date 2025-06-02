@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 import {
   Home,
   Users,
@@ -15,7 +14,11 @@ import {
 import { cn } from "@/lib/utils";
 import { useCurrentUser } from "@/hooks/useUserQueries";
 import { useState } from "react";
-import Image from "next/image";
+import SidebarNavItem from "./SidebarNavItem";
+import MobileNavItem from "./MobileNavItem";
+import MoreOverlayItem from "./MoreOverlayItem";
+import SidebarChannelLink from "./SidebarChannelLink";
+import SidebarFooter from "./SidebarFooter";
 
 interface SidebarProps {
   mobileView?: boolean;
@@ -126,7 +129,6 @@ export default function Sidebar({
       requiresAuth: true,
     },
   ];
-
   if (mobileBottomNav) {
     return (
       <>
@@ -135,38 +137,18 @@ export default function Sidebar({
           if (item.requiresAuth && !user) return null;
 
           return (
-            <Link
+            <MobileNavItem
               key={item.name}
+              name={item.name}
               href={item.href}
-              className="flex flex-col items-center py-2 px-1"
-            >
-              <div
-                className={cn(
-                  "flex items-center justify-center w-10 h-10 rounded-xl mb-1",
-                  isActive(item.href)
-                    ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                    : "text-gray-500 dark:text-gray-400"
-                )}
-              >
-                <item.icon
-                  className={cn(
-                    "h-5 w-5",
-                    isActive(item.href)
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-gray-500 dark:text-gray-400"
-                  )}
-                />
-              </div>
-              <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-                {item.name}
-              </span>
-            </Link>
+              icon={item.icon}
+              active={isActive(item.href)}
+            />
           );
         })}
       </>
     );
   }
-
   if (moreOverlay) {
     return (
       <div className="grid grid-cols-2 gap-2">
@@ -175,35 +157,13 @@ export default function Sidebar({
           if (item.requiresAuth && !user) return null;
 
           return (
-            <Link
+            <MoreOverlayItem
               key={item.name}
+              name={item.name}
               href={item.href}
-              className={cn(
-                "flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
-                isActive(item.href)
-                  ? "bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-indigo-900/20 text-blue-600 dark:text-blue-400 shadow-sm"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-blue-900/10 dark:hover:text-blue-300 hover:shadow-sm dark:hover:border-blue-800/30"
-              )}
-            >
-              <div
-                className={cn(
-                  "flex items-center justify-center w-9 h-9 rounded-xl transition-colors duration-200",
-                  isActive(item.href)
-                    ? "bg-blue-100 dark:bg-blue-900/30"
-                    : "bg-gray-100 dark:bg-black/40 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20"
-                )}
-              >
-                <item.icon
-                  className={cn(
-                    "h-5 w-5 transition-colors duration-200",
-                    isActive(item.href)
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-gray-500 dark:text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-300"
-                  )}
-                />
-              </div>
-              <span className="ml-3">{item.name}</span>
-            </Link>
+              icon={item.icon}
+              active={isActive(item.href)}
+            />
           );
         })}
       </div>
@@ -259,9 +219,7 @@ export default function Sidebar({
               </svg>
             )}
           </button>
-        )}
-
-        <div
+        )}        <div
           className={cn(
             "space-y-0 pt-1",
             mobileView && "grid grid-cols-2 gap-2"
@@ -272,103 +230,23 @@ export default function Sidebar({
             if (item.requiresAuth && !user) return null;
 
             return (
-              <Link
+              <SidebarNavItem
                 key={item.name}
+                name={item.name}
                 href={item.href}
-                className={cn(
-                  "flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
-                  isActive(item.href)
-                    ? "bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-indigo-900/20 text-blue-600 dark:text-blue-400 shadow-sm"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-blue-900/10 dark:hover:text-blue-300 hover:shadow-sm dark:hover:border-blue-800/30"
-                )}
-              >
-                <div
-                  className={cn(
-                    "flex items-center justify-center w-9 h-9 rounded-xl transition-colors duration-200",
-                    isActive(item.href)
-                      ? "bg-blue-100 dark:bg-blue-900/30"
-                      : "bg-gray-100 dark:bg-black/40 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20"
-                  )}
-                >
-                  <item.icon
-                    className={cn(
-                      "h-5 w-5 transition-colors duration-200",
-                      isActive(item.href)
-                        ? "text-blue-600 dark:text-blue-400"
-                        : "text-gray-500 dark:text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-300"
-                    )}
-                  />
-                </div>
-                {(expanded || mobileView) && (
-                  <span className="ml-3">{item.name}</span>
-                )}
-              </Link>
+                icon={item.icon}
+                active={isActive(item.href)}
+                expanded={expanded}
+                mobileView={mobileView}
+              />
             );
           })}
-        </div>
-
-        {(expanded || mobileView) && user && (
-          <div className="mt-auto pt-1 px-3">
-            <div className="border-t border-gray-200 dark:border-gray-800 pt-4 mt-4">
-              <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                Your Channel
-              </h3>
-              <Link
-                href={`/channel/${user.username}`}
-                className="flex items-center p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-blue-900/10 dark:hover:text-blue-300 transition-all duration-200 hover:shadow-sm"
-              >
-                <Image
-                  src={user.avatar || "/default-avatar.png"}
-                  alt={user.username}
-                  width={40}
-                  height={40}
-                  className="rounded-full h-10 w-10 border-2 object-cover border-white dark:border-gray-800 shadow-sm group-hover:border-blue-200 dark:group-hover:border-blue-800"
-                />
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {user.fullname || user.username}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    @{user.username}
-                  </p>
-                </div>
-              </Link>
-            </div>
-          </div>
+        </div>        {(expanded || mobileView) && user && (
+          <SidebarChannelLink user={user} />
         )}
 
         {(expanded || mobileView) && (
-          <div className="mt-6 px-3 pt-4 border-t border-gray-200 dark:border-gray-800">
-            <div className="flex flex-wrap text-xs text-gray-500 dark:text-gray-400 gap-x-2">
-              <a
-                href="#"
-                className="hover:underline hover:text-blue-500 dark:hover:text-blue-300 transition-colors duration-200"
-              >
-                About
-              </a>
-              <a
-                href="#"
-                className="hover:underline hover:text-blue-500 dark:hover:text-blue-300 transition-colors duration-200"
-              >
-                Contact
-              </a>
-              <a
-                href="#"
-                className="hover:underline hover:text-blue-500 dark:hover:text-blue-300 transition-colors duration-200"
-              >
-                Terms
-              </a>
-              <a
-                href="#"
-                className="hover:underline hover:text-blue-500 dark:hover:text-blue-300 transition-colors duration-200"
-              >
-                Privacy
-              </a>
-            </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-              © 2025 VideoVault
-            </p>
-          </div>
+          <SidebarFooter />
         )}
       </div>
     </aside>
