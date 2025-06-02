@@ -5,7 +5,7 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import { X, ArrowUp, MoreHorizontal } from "lucide-react";
 import VideoVaultLogo from "@/components/common/VideoVaultLogo";
-import TopProgressBar from "@/components/common/TopProgressBar";
+import TopProgressBarWrapper from "@/components/common/TopProgressBarWrapper";
 import PageTransition from "@/components/common/PageTransition";
 
 export default function MainLayout({
@@ -37,8 +37,8 @@ export default function MainLayout({
 
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-black">
-      {/* Place TopProgressBar */}
-      <TopProgressBar />
+      {/* Place TopProgressBarWrapper instead */}
+      <TopProgressBarWrapper />
 
       <Header />
 

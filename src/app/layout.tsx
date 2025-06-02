@@ -4,7 +4,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import Favicon from "@/components/common/Favicon";
-import TopProgressBar from "@/components/common/TopProgressBar";
+import TopProgressBarWrapper from "@/components/common/TopProgressBarWrapper";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -71,7 +71,7 @@ export default function RootLayout({
       <body className={`${inter.className} transition-colors duration-200`}>
         <ThemeProvider>
           <QueryProvider>
-            <TopProgressBar />
+            <TopProgressBarWrapper />
             <div className="page-transition-wrapper">{children}</div>
           </QueryProvider>
         </ThemeProvider>
