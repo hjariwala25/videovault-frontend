@@ -5,6 +5,8 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import { X, ArrowUp, MoreHorizontal } from "lucide-react";
 import VideoVaultLogo from "@/components/common/VideoVaultLogo";
+import TopProgressBar from "@/components/common/TopProgressBar";
+import PageTransition from "@/components/common/PageTransition";
 
 export default function MainLayout({
   children,
@@ -35,6 +37,9 @@ export default function MainLayout({
 
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-black">
+      {/* Place TopProgressBar */}
+      <TopProgressBar />
+
       <Header />
 
       <div className="flex flex-1">
@@ -89,11 +94,13 @@ export default function MainLayout({
           </button>
         </div>
 
-        {/* Main Content */}
+        {/* Main Content with Page Transition */}
         <main className="flex-1 p-4 max-w-7xl mx-auto w-full pb-24 md:pb-16 text-gray-900 dark:text-gray-100 pb-safe">
-          <div className="transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-bottom-4">
-            {children}
-          </div>
+          <PageTransition>
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+              {children}
+            </div>
+          </PageTransition>
         </main>
       </div>
 

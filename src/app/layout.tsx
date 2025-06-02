@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import Favicon from "@/components/common/Favicon";
+import TopProgressBar from "@/components/common/TopProgressBar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -56,6 +57,9 @@ export default function RootLayout({
                   
                   document.documentElement.classList.remove('light', 'dark');
                   document.documentElement.classList.add(isDark ? 'dark' : 'light');
+                  
+                  // Set background color immediately to prevent flash
+                  document.documentElement.style.backgroundColor = isDark ? '#000' : '#fff';
                 } catch (e) {
                   console.error('Theme init error:', e);
                 }
@@ -64,9 +68,12 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} transition-colors duration-200`}>
         <ThemeProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <TopProgressBar />
+            <div className="page-transition-wrapper">{children}</div>
+          </QueryProvider>
         </ThemeProvider>
         <Toaster />
       </body>
