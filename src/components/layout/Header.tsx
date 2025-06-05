@@ -68,36 +68,34 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Search area - Different behavior for mobile and desktop */}
-          <div
-            className={`flex-grow max-w-md mx-2 md:mx-4 ${
-              searchExpanded ? "flex items-center" : ""
-            }`}
-          >
-            {/* Desktop search - always visible */}
-            <div className="hidden md:block w-full">
-              <SearchBar
-                placeholder="Search"
-                onSearch={handleSearchComplete}
-                className="w-full"
-              />
-            </div>
-
-            {/* Mobile search */}
-            <MobileSearch
-              expanded={searchExpanded}
-              onToggle={toggleMobileSearch}
-              onSearchComplete={handleSearchComplete}
+          {/* Search area - Desktop only */}
+          <div className="hidden md:block flex-grow max-w-md mx-2 md:mx-4">
+            <SearchBar
+              placeholder="Search"
+              onSearch={handleSearchComplete}
+              className="w-full"
             />
           </div>
 
           {/* Right section: Navigation and profile */}
-          <div
-            className={`flex-shrink-0 flex items-center space-x-1 sm:space-x-3 ${
-              searchExpanded ? "hidden md:flex" : ""
-            }`}
-          >
+          <div className="flex-shrink-0 flex items-center space-x-1 sm:space-x-3">
+            {/* Mobile search - Only visible on mobile */}
+            <div
+              className={`md:hidden ${
+                searchExpanded
+                  ? "fixed inset-0 bg-white dark:bg-black z-50 p-4"
+                  : ""
+              }`}
+            >
+              <MobileSearch
+                expanded={searchExpanded}
+                onToggle={toggleMobileSearch}
+                onSearchComplete={handleSearchComplete}
+              />
+            </div>
+
             <ThemeToggle />
+
             {user ? (
               <>
                 <Link

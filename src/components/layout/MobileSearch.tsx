@@ -14,32 +14,35 @@ export default function MobileSearch({
   onToggle,
   onSearchComplete,
 }: MobileSearchProps) {
-  return (
-    <div className="md:hidden flex items-center w-full">
-      {expanded ? (
-        <>
-          <div className="flex-grow">
-            <SearchBar
-              placeholder="Search"
-              onSearch={onSearchComplete}
-              className="w-full"
-            />
-          </div>
+  if (expanded) {
+    return (
+      <div className="absolute inset-0 bg-white dark:bg-black z-50 p-4">
+        <div className="flex items-center gap-2">
+          <SearchBar
+            placeholder="Search"
+            onSearch={() => {
+              onSearchComplete();
+              onToggle();
+            }}
+            className="flex-1"
+          />
           <button
             onClick={onToggle}
-            className="ml-2 p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full"
+            className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full"
           >
             <X size={20} />
           </button>
-        </>
-      ) : (
-        <button
-          onClick={onToggle}
-          className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full"
-        >
-          <Search size={20} />
-        </button>
-      )}
-    </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={onToggle}
+      className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-full hover:bg-blue-50 dark:hover:bg-black/40 transition-all duration-200"
+    >
+      <Search size={20} />
+    </button>
   );
 }
