@@ -42,8 +42,8 @@ export default function Channel() {
   useEffect(() => {
     setIsClient(true);
     if (videoData) {
-      console.log("Channel videos data:", videoData);
-      console.log("Extracted videos:", videos);
+      // console.log("Channel videos data:", videoData);
+      // console.log("Extracted videos:", videos);
     }
   }, [videoData, videos]);
 

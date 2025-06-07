@@ -36,13 +36,13 @@ export default function EditPlaylistModal({
   // Reset form data when modal opens or playlist changes
   useEffect(() => {
     if (playlist) {
-      console.log("Playlist received in modal:", playlist);
+      // console.log("Playlist received in modal:", playlist);
 
       let id = null;
 
       if (playlist._id) {
         id = playlist._id;
-        console.log("Found ID directly:", id);
+        // console.log("Found ID directly:", id);
       } //  else if (playlist.playlistVideos && playlist.playlistVideos[0]?._id) {
       //   id = playlist.playlistVideos[0]._id;
       //   console.log("Found ID in nested structure:", id);
@@ -56,11 +56,11 @@ export default function EditPlaylistModal({
       setDescription(playlist.description || "");
 
       // Log current form values for debugging
-      console.log("Set form values:", {
-        id,
-        name: playlist.name || "",
-        description: playlist.description || "",
-      });
+      // console.log("Set form values:", {
+      //   id,
+      //   name: playlist.name || "",
+      //   description: playlist.description || "",
+      // });
     }
   }, [playlist, isOpen]);
 

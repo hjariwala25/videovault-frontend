@@ -53,7 +53,7 @@ export default function PlaylistPage() {
   useEffect(() => {
     if (!playlist) return;
 
-    console.log("Raw playlist data:", playlist);
+    // console.log("Raw playlist data:", playlist);
 
     try {
       if (
@@ -82,7 +82,7 @@ export default function PlaylistPage() {
           extractedIds = playlist.videos.map((item: string | string[]) =>
             Array.isArray(item) ? item[0] : item
           );
-          console.log("Falling back to IDs in playlist.videos:", extractedIds);
+          // console.log("Falling back to IDs in playlist.videos:", extractedIds);
           setVideoIds(extractedIds);
 
           // Create placeholder objects
@@ -107,11 +107,11 @@ export default function PlaylistPage() {
 
   useEffect(() => {
     if (!videoDetails) {
-      console.log("No video details returned from API");
+      // console.log("No video details returned from API");
       return;
     }
 
-    console.log("Video details received:", videoDetails);
+    // console.log("Video details received:", videoDetails);
 
     const currentVideos = [...processedVideos];
 
@@ -135,7 +135,7 @@ export default function PlaylistPage() {
       const enhancedVideos = currentVideos.map((video) => {
         const details = videoMap[video._id];
         if (details) {
-          console.log(`Found details for video ${video._id}:`, details.title);
+          // console.log(`Found details for video ${video._id}:`, details.title);
           return {
             ...video,
             title: details.title || video.title,
@@ -149,7 +149,7 @@ export default function PlaylistPage() {
         return video;
       });
 
-      console.log("Enhanced videos:", enhancedVideos);
+      // console.log("Enhanced videos:", enhancedVideos);
       setProcessedVideos(enhancedVideos);
     }
   }, [videoDetails]);

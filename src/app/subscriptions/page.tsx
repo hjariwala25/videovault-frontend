@@ -28,7 +28,7 @@ export default function Subscriptions() {
   useEffect(() => {
     setIsClient(true);
     if (subscriptionsData) {
-      console.log("Raw subscription data:", subscriptionsData);
+      // console.log("Raw subscription data:", subscriptionsData);
     }
   }, [subscriptionsData]);
   useEffect(() => {

@@ -2,10 +2,10 @@ import axios from "axios";
 import { toast } from "sonner";
 
 // Simple environment check
-const isProd = process.env.NODE_ENV === "production";
-console.log(`Running in ${isProd ? "PRODUCTION" : "DEVELOPMENT"} mode`);
-console.log(`API URL: ${process.env.NEXT_PUBLIC_API_URL}`);
-console.log(`Frontend URL: ${process.env.NEXT_PUBLIC_FRONTEND_URL}`);
+// const isProd = process.env.NODE_ENV === "production";
+// console.log(`Running in ${isProd ? "PRODUCTION" : "DEVELOPMENT"} mode`);
+// console.log(`API URL: ${process.env.NEXT_PUBLIC_API_URL}`);
+// console.log(`Frontend URL: ${process.env.NEXT_PUBLIC_FRONTEND_URL}`);
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -25,10 +25,10 @@ api.interceptors.request.use(
 
     // Add debug info in development
     if (process.env.NODE_ENV !== "production") {
-      console.log(`${config.method?.toUpperCase()} ${config.url}`, {
-        withCredentials: config.withCredentials,
-        headers: config.headers,
-      });
+      // console.log(`${config.method?.toUpperCase()} ${config.url}`, {
+      //   withCredentials: config.withCredentials,
+      //   headers: config.headers,
+      // });
     }
 
     return config;
@@ -80,7 +80,7 @@ api.interceptors.response.use(
         if (refreshResponse.status === 200) {
           // Log success message in development
           if (process.env.NODE_ENV !== "production") {
-            console.log("Token refreshed successfully");
+            // console.log("Token refreshed successfully");
           }
           return api(originalRequest);
         }

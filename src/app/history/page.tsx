@@ -19,7 +19,7 @@ export default function History() {
   useEffect(() => {
     setIsClient(true);
     if (historyData) {
-      console.log("History data received:", historyData);
+      // console.log("History data received:", historyData);
     }
   }, [historyData]);
 
