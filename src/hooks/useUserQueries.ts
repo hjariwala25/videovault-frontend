@@ -83,9 +83,6 @@ export function useLogout() {
       await api.post("/users/logout");
     },
     onSuccess: () => {
-      // Clear any stored data
-      localStorage.removeItem("user");
-
       // Reset all queries and clear cache fully
       queryClient.resetQueries();
       queryClient.clear();
