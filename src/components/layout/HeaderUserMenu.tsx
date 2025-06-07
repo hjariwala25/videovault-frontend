@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useLogout } from "@/hooks/useUserQueries";
+import { toast } from "sonner";
 
 interface HeaderUserMenuProps {
   user: {
@@ -24,13 +25,19 @@ interface HeaderUserMenuProps {
 export default function HeaderUserMenu({ user }: HeaderUserMenuProps) {
   const router = useRouter();
   const logout = useLogout();
-
   const handleLogout = async () => {
     try {
+      // Set the logging out flag 
+      window.__loggingOut = true;
+
       await logout.mutateAsync();
-      router.push("/login");
+      setTimeout(() => {
+        router.push("/login");
+      }, 100);
     } catch (error) {
       console.error("Logout failed:", error);
+      toast.error("Failed to logout. Please try again.");
+      window.__loggingOut = false;
     }
   };
 

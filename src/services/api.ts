@@ -43,6 +43,11 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
+    //handle 401 errors during logout
+    if (window.__loggingOut && error.response?.status === 401) {
+      return Promise.reject(error);
+    }
+
     // Enhanced error logging
     if (process.env.NODE_ENV !== "production") {
       console.error("API Error:", {
@@ -53,14 +58,13 @@ api.interceptors.response.use(
     }
 
     const originalRequest = error.config;
-    const isRefreshRequest = originalRequest.url?.includes("refresh-token");
-
-    // Don't attempt refresh for login/refresh endpoints
+    const isRefreshRequest = originalRequest.url?.includes("refresh-token"); 
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
       !isRefreshRequest &&
-      !originalRequest.url?.includes("login")
+      !originalRequest.url?.includes("login") &&
+      !window.__loggingOut
     ) {
       originalRequest._retry = true;
 
@@ -92,13 +96,17 @@ api.interceptors.response.use(
           }, 1000);
         }
       }
-    }
-
-    // For network errors (common in mobile when offline)
+    } // For network errors (common in mobile when offline)
     if (!error.response && error.message.includes("Network Error")) {
       toast.error(
         "Network connection issue. Please check your internet connection."
       );
+    }
+
+    // If we're logging out, suppress 401 error toasts to avoid disrupting the user experience
+    if (window.__loggingOut && error.response?.status === 401) {
+      // Silently reject without showing toasts for 401 errors during logout
+      return Promise.reject(error);
     }
 
     return Promise.reject(error);

@@ -12,6 +12,14 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
           queries: {
             staleTime: 60 * 1000, // 1 minute
             refetchOnWindowFocus: false,
+            retry: (failureCount, error) => {
+              // If logging out, don't retry on 401 errors
+              const err = error as { response?: { status?: number } };
+              if (window.__loggingOut && err?.response?.status === 401) {
+                return false;
+              }
+              return failureCount < 3;
+            },
           },
         },
       })

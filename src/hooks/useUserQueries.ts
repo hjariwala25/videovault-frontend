@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/services/api";
 import { queryKeys } from "@/lib/queryKeys";
 import { ChannelProfile } from "@/types";
+import { toast } from "sonner";
 
 // Get current user
 export function useCurrentUser() {
@@ -73,12 +74,30 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: async () => {
+      // Mark that we are logging out to prevent unnecessary errors
+      window.__loggingOut = true;
+      // Clear all cache
+      queryClient.cancelQueries();
+      queryClient.clear();
+
       await api.post("/users/logout");
     },
     onSuccess: () => {
       // Clear any stored data
       localStorage.removeItem("user");
+
+      // Reset all queries and clear cache fully
       queryClient.resetQueries();
+      queryClient.clear();
+
+      toast.success("Logged out successfully");
+    },
+    onError: () => {
+      toast.error("Failed to logout. Please try again.");
+    },
+    onSettled: () => {
+      // Reset the logging out flag
+      window.__loggingOut = false;
     },
   });
 }

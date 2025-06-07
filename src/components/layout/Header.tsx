@@ -35,15 +35,19 @@ export default function Header() {
     setMobileMenuOpen(false);
     setSearchExpanded(false);
   };
-
   const handleLogout = async () => {
     try {
+      window.__loggingOut = true;
+
       await logout.mutateAsync();
-      toast.success("Logged out successfully");
-      router.push("/login");
+      setTimeout(() => {
+        router.push("/login");
+      }, 100);
     } catch (error) {
       console.error("Logout failed:", error);
       toast.error("Failed to logout. Please try again.");
+      // Reset logging out flag
+      window.__loggingOut = false;
     }
   };
 
