@@ -12,6 +12,7 @@ import VideoVaultLogo from "@/components/common/VideoVaultLogo";
 import HeaderUserMenu from "./HeaderUserMenu";
 import MobileMenu from "./MobileMenu";
 import MobileSearch from "./MobileSearch";
+import { toast } from "sonner";
 
 export default function Header() {
   const router = useRouter();
@@ -38,9 +39,11 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await logout.mutateAsync();
+      toast.success("Logged out successfully");
       router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);
+      toast.error("Failed to logout. Please try again.");
     }
   };
 
