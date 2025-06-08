@@ -25,8 +25,8 @@ export default function Login() {
       await loginMutation.mutateAsync(credentials);
       toast.dismiss(loadingToast);
       toast.success("Login successful!");
-      // Use window.location for more reliable navigation after login
-      window.location.href = "/";
+      // Remove this line - let the mutation handle navigation
+      // window.location.href = "/";
     } catch {
       toast.dismiss(loadingToast);
       // Error handling done in mutation onError
