@@ -28,8 +28,10 @@ export default function Login() {
       // Show success notification
       toast.success("Login successful!");
 
-      // Navigate to home page
-      router.push("/");
+      // Redirect to home page after a short delay
+      setTimeout(() => {
+        router.push("/");
+      }, 300); 
     } catch (error) {
       let errorMessage = "Please check your credentials";
       if (error && typeof error === "object" && "response" in error) {
