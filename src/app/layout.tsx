@@ -5,6 +5,7 @@ import { QueryProvider } from "@/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import Favicon from "@/components/common/Favicon";
 import TopProgressBarWrapper from "@/components/common/TopProgressBarWrapper";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -76,6 +77,7 @@ export default function RootLayout({
           </QueryProvider>
         </ThemeProvider>
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );
