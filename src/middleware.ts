@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Define which routes are publicly accessible without login
-const publicRoutes = ["/login", "/register"];
-
-// Routes that should redirect to login if user is not authenticated
+const publicRoutes = ["/login", "/register", "/terms", "/privacy"];
 const protectedRoutes = [
   "/dashboard",
   "/settings",
@@ -18,16 +15,33 @@ const protectedRoutes = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Check if user is logged in by examining the access token
+  // Get authentication tokens
   const accessToken = request.cookies.get("accessToken")?.value;
-  const isLoggedIn = !!accessToken;
+  const refreshToken = request.cookies.get("refreshToken")?.value;
 
-  // Always allow access to public routes
+  const isLoggedIn = !!(accessToken || refreshToken);
+
+  // Create response
+  const response = NextResponse.next();
+
+  // Public routes handling
   if (publicRoutes.some((route) => pathname.startsWith(route))) {
-    return NextResponse.next();
+    // Redirect logged-in users away from login/register pages
+    if ((pathname === "/login" || pathname === "/register") && isLoggedIn) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    return response;
   }
 
-  // Redirect to login if trying to access protected routes without authentication
+  // Add cache control only for protected routes (not all routes)
+  if (
+    protectedRoutes.some((route) => pathname.startsWith(route)) ||
+    pathname === "/"
+  ) {
+    response.headers.set("Cache-Control", "no-cache, must-revalidate");
+  }
+
+  // Protected routes - require authentication
   if (
     protectedRoutes.some((route) => pathname.startsWith(route)) &&
     !isLoggedIn
@@ -35,15 +49,14 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // For home page, decide based on authentication status
+  // Home page - redirect to login if not authenticated
   if (pathname === "/" && !isLoggedIn) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  return NextResponse.next();
+  return response;
 }
 
-// Configure middleware to run on specific paths
 export const config = {
   matcher: [
     "/",

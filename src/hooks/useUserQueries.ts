@@ -3,6 +3,7 @@ import api from "@/services/api";
 import { queryKeys } from "@/lib/queryKeys";
 import { ChannelProfile } from "@/types";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 // Get current user
 export function useCurrentUser() {
@@ -39,9 +40,10 @@ export function useWatchHistory() {
   });
 }
 
-// Login user
+// login user
 export function useLogin() {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation({
     mutationFn: async (credentials: {
@@ -53,7 +55,20 @@ export function useLogin() {
       return response.data.data;
     },
     onSuccess: (data) => {
+      // Set user data immediately
       queryClient.setQueryData(queryKeys.user.current(), data.user);
+
+      // Wait for all auth-related queries to be updated
+      queryClient.invalidateQueries({
+        queryKey: ["user"],
+        refetchType: "active",
+      });
+
+      // Navigate after state is properly set
+      router.replace("/");
+    },
+    onError: (error) => {
+      toast.error(`Login failed: ${error}`);
     },
   });
 }

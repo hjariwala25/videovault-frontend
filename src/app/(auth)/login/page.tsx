@@ -1,7 +1,6 @@
 "use client";
 
 import { useLogin } from "@/hooks/useUserQueries";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -10,37 +9,26 @@ import LoginForm from "@/components/auth/LoginForm";
 
 export default function Login() {
   const loginMutation = useLogin();
-  const router = useRouter();
 
   const handleSubmit = async (credentials: {
     username: string;
     password: string;
   }) => {
-    // validation
     if (!credentials.username || !credentials.password) {
       toast.error("Please enter both username and password");
       return;
     }
 
+    const loadingToast = toast.loading("Logging in...");
+    
     try {
       await loginMutation.mutateAsync(credentials);
-
-      // Show success notification
+      toast.dismiss(loadingToast);
       toast.success("Login successful!");
-
-      // Redirect to home page after a short delay
-      setTimeout(() => {
-        router.push("/");
-      }, 300); 
-    } catch (error) {
-      let errorMessage = "Please check your credentials";
-      if (error && typeof error === "object" && "response" in error) {
-        const err = error as { response?: { data?: { message?: string } } };
-        if (err.response?.data?.message) {
-          errorMessage = err.response.data.message;
-        }
-      }
-      toast.error(`Login failed: ${errorMessage}`);
+      // Navigation handled in mutation onSuccess
+    } catch {
+      toast.dismiss(loadingToast);
+      // Error handling done in mutation onError
     }
   };
 
