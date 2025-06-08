@@ -65,7 +65,7 @@ export function useLogin() {
       });
 
       // Navigate after state is properly set
-      router.replace("/");
+      router.push("/");
     },
     onError: (error) => {
       toast.error(`Login failed: ${error}`);

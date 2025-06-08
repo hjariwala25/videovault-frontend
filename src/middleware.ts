@@ -1,73 +1,42 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicRoutes = ["/login", "/register", "/terms", "/privacy"];
-const protectedRoutes = [
-  "/dashboard",
-  "/settings",
-  "/likedvideos",
-  "/history",
-  "/playlists",
-  "/subscriptions",
-  "/tweets",
-];
+const publicRoutes = ["/login", "/register"];
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  // Normalize pathname (remove trailing slash except for root)
+  let pathname = request.nextUrl.pathname;
+  if (pathname !== "/" && pathname.endsWith("/")) {
+    pathname = pathname.slice(0, -1);
+  }
+
+  // Only allow exact /login and /register as public
+  const isPublicRoute = publicRoutes.includes(pathname);
 
   // Get authentication tokens
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
-
   const isLoggedIn = !!(accessToken || refreshToken);
 
-  // Create response
-  const response = NextResponse.next();
-
-  // Public routes handling
-  if (publicRoutes.some((route) => pathname.startsWith(route))) {
-    // Redirect logged-in users away from login/register pages
-    if ((pathname === "/login" || pathname === "/register") && isLoggedIn) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-    return response;
-  }
-
-  // Add cache control only for protected routes (not all routes)
-  if (
-    protectedRoutes.some((route) => pathname.startsWith(route)) ||
-    pathname === "/"
-  ) {
-    response.headers.set("Cache-Control", "no-cache, must-revalidate");
-  }
-
-  // Protected routes - require authentication
-  if (
-    protectedRoutes.some((route) => pathname.startsWith(route)) &&
-    !isLoggedIn
-  ) {
+  // If not logged in and not on a public route (including "/"), redirect to /login
+  if (!isLoggedIn && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Home page - redirect to login if not authenticated
-  if (pathname === "/" && !isLoggedIn) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  // If logged in and trying to access /login or /register, redirect to home
+  if (isLoggedIn && isPublicRoute) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/",
-    "/dashboard/:path*",
-    "/settings/:path*",
-    "/likedvideos/:path*",
-    "/history/:path*",
-    "/playlists/:path*",
-    "/subscriptions/:path*",
-    "/tweets/:path*",
-    "/login",
-    "/register",
+    // Match all routes except for:
+    // - /api routes
+    // - _next/static, _next/image
+    // - favicon.ico
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

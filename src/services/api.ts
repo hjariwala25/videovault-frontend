@@ -58,7 +58,7 @@ api.interceptors.response.use(
     }
 
     const originalRequest = error.config;
-    const isRefreshRequest = originalRequest.url?.includes("refresh-token"); 
+    const isRefreshRequest = originalRequest.url?.includes("refresh-token");
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
@@ -89,12 +89,12 @@ api.interceptors.response.use(
           return api(originalRequest);
         }
       } catch {
-        if (!window.location.pathname.includes("/login")) {
-          toast.error("Your session has expired. Please log in again.");
-          setTimeout(() => {
-            window.location.href = "/login";
-          }, 1000);
-        }
+        // if (!window.location.pathname.includes("/login")) {
+        //   toast.error("Your session has expired. Please log in again.");
+        //   setTimeout(() => {
+        //     window.location.href = "/login";
+        //   }, 1000);
+        // }
       }
     } // For network errors (common in mobile when offline)
     if (!error.response && error.message.includes("Network Error")) {

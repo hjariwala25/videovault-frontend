@@ -14,17 +14,7 @@ const inter = Inter({
 export const metadata = {
   title: "VideoVault",
   description: "A video streaming platform",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: true,
-    viewportFit: "cover",
-  },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
+
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
