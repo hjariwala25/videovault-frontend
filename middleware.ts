@@ -19,23 +19,14 @@ export function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get("refreshToken")?.value;
   const isLoggedIn = !!(accessToken || refreshToken);
 
-  console.log("Middleware:", {
-    pathname: normalizedPathname,
-    isPublicRoute,
-    isLoggedIn,
-    hasAccessToken: !!accessToken,
-    hasRefreshToken: !!refreshToken,
-  });
 
   // If not logged in and trying to access protected route
   if (!isLoggedIn && !isPublicRoute) {
-    console.log("Redirecting to login - not authenticated");
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   // If logged in and trying to access auth pages
   if (isLoggedIn && isPublicRoute) {
-    console.log("Redirecting to home - already authenticated");
     return NextResponse.redirect(new URL("/", request.url));
   }
 

@@ -63,11 +63,7 @@ export function useLogin() {
         queryKey: ["user"],
       });
 
-      // Navigate after a short delay to ensure cookies are processed
-      setTimeout(() => {
-        router.push("/");
-        router.refresh(); // Force a refresh to ensure middleware sees the cookies
-      }, 100);
+      router.push("/");
     },
     onError: (error) => {
       toast.error(`Login failed: ${error}`);
