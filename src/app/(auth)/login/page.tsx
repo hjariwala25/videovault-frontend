@@ -20,12 +20,13 @@ export default function Login() {
     }
 
     const loadingToast = toast.loading("Logging in...");
-    
+
     try {
       await loginMutation.mutateAsync(credentials);
       toast.dismiss(loadingToast);
       toast.success("Login successful!");
-      // Navigation handled in mutation onSuccess
+      // Use window.location for more reliable navigation after login
+      window.location.href = "/";
     } catch {
       toast.dismiss(loadingToast);
       // Error handling done in mutation onError

@@ -18,7 +18,7 @@ export function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get("refreshToken")?.value;
   const isLoggedIn = !!(accessToken || refreshToken);
 
-  // If not logged in and not on a public route (including "/"), redirect to /login
+  // If not logged in and not on a public route, redirect to /login
   if (!isLoggedIn && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
   }

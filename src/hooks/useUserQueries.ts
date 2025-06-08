@@ -64,8 +64,10 @@ export function useLogin() {
         refetchType: "active",
       });
 
-      // Navigate after state is properly set
-      router.push("/");
+      // Add a small delay to ensure cookies are set before navigation
+      setTimeout(() => {
+        router.push("/");
+      }, 100);
     },
     onError: (error) => {
       toast.error(`Login failed: ${error}`);
