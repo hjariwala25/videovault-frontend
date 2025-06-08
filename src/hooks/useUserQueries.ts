@@ -3,6 +3,7 @@ import api from "@/services/api";
 import { queryKeys } from "@/lib/queryKeys";
 import { ChannelProfile } from "@/types";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 // Get current user
 export function useCurrentUser() {
@@ -42,6 +43,7 @@ export function useWatchHistory() {
 // login user
 export function useLogin() {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation({
     mutationFn: async (credentials: {
@@ -56,17 +58,16 @@ export function useLogin() {
       // Set user data immediately
       queryClient.setQueryData(queryKeys.user.current(), data.user);
 
-      // Wait for all auth-related queries to be updated
+      // Invalidate and refetch user queries
       queryClient.invalidateQueries({
         queryKey: ["user"],
-        refetchType: "active",
       });
 
-      // Use window.location for production reliability
-      // This ensures cookies are properly set before navigation
+      // Navigate after a short delay to ensure cookies are processed
       setTimeout(() => {
-        window.location.href = "/";
-      }, 300);
+        router.push("/");
+        router.refresh(); // Force a refresh to ensure middleware sees the cookies
+      }, 100);
     },
     onError: (error) => {
       toast.error(`Login failed: ${error}`);

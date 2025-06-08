@@ -4,27 +4,38 @@ import type { NextRequest } from "next/server";
 const publicRoutes = ["/login", "/register"];
 
 export function middleware(request: NextRequest) {
-  // Normalize pathname (remove trailing slash except for root)
-  let pathname = request.nextUrl.pathname;
-  if (pathname !== "/" && pathname.endsWith("/")) {
-    pathname = pathname.slice(0, -1);
-  }
+  const { pathname } = request.nextUrl;
 
-  // Only allow exact /login and /register as public
-  const isPublicRoute = publicRoutes.includes(pathname);
+  // Normalize pathname (remove trailing slash except for root)
+  const normalizedPathname =
+    pathname !== "/" && pathname.endsWith("/")
+      ? pathname.slice(0, -1)
+      : pathname;
+
+  const isPublicRoute = publicRoutes.includes(normalizedPathname);
 
   // Get authentication tokens
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
   const isLoggedIn = !!(accessToken || refreshToken);
 
-  // If not logged in and not on a public route, redirect to /login
+  console.log("Middleware:", {
+    pathname: normalizedPathname,
+    isPublicRoute,
+    isLoggedIn,
+    hasAccessToken: !!accessToken,
+    hasRefreshToken: !!refreshToken,
+  });
+
+  // If not logged in and trying to access protected route
   if (!isLoggedIn && !isPublicRoute) {
+    console.log("Redirecting to login - not authenticated");
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // If logged in and trying to access /login or /register, redirect to home
+  // If logged in and trying to access auth pages
   if (isLoggedIn && isPublicRoute) {
+    console.log("Redirecting to home - already authenticated");
     return NextResponse.redirect(new URL("/", request.url));
   }
 
