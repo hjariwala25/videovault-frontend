@@ -1,7 +1,5 @@
 #  VideoVault Frontend
 
-
-
 ## 🚀 Live Demo
 
 VideoVault : [https://videovault-iota.vercel.app](https://videovault-iota.vercel.app)
