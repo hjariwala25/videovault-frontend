@@ -50,8 +50,7 @@ export function useLogin() {
     }) => {
       const response = await api.post("/users/login", credentials);
       return response.data.data;
-    },
-    onSuccess: (data) => {
+    },    onSuccess: (data) => {
       // Set user data immediately
       queryClient.setQueryData(queryKeys.user.current(), data.user);
 
@@ -59,6 +58,10 @@ export function useLogin() {
       queryClient.invalidateQueries({
         queryKey: ["user"],
       });
+
+      // Store authentication status in localStorage to maintain session
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("authTimestamp", String(new Date().getTime()));
 
       // Give cookies more time to be properly set and recognized by the browser
       setTimeout(() => {
@@ -86,7 +89,6 @@ export function useRegister() {
 // Logout user
 export function useLogout() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async () => {
       // Mark that we are logging out to prevent unnecessary errors
@@ -95,12 +97,18 @@ export function useLogout() {
       queryClient.cancelQueries();
       queryClient.clear();
 
+      // Clear the authentication session cookie by setting an expired date
+      document.cookie = "authSession=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+
       await api.post("/users/logout");
-    },
-    onSuccess: () => {
+    },onSuccess: () => {
       // Reset all queries and clear cache fully
       queryClient.resetQueries();
       queryClient.clear();
+
+      // Clear authentication data from localStorage
+      localStorage.removeItem("isAuthenticated");
+      localStorage.removeItem("authTimestamp");
 
       toast.success("Logged out successfully");
     },

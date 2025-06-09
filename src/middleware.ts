@@ -17,16 +17,29 @@ export function middleware(request: NextRequest) {
   // Get authentication tokens
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
-  const isLoggedIn = !!(accessToken || refreshToken); // Check if the auth param is present (indicates coming from login process)
+  const isLoggedIn = !!(accessToken || refreshToken); 
+  
+  // Check for auth flags
   const isAuthRedirect = request.nextUrl.searchParams.has("auth");
+  // Create a response that we can modify
+  const response = NextResponse.next();
 
-  // If this is the home route and we have auth param, let it proceed without middleware checks
+  // If this is the home route and we have auth param, set an auth cookie and proceed
   if (normalizedPathname === "/" && isAuthRedirect) {
-    return NextResponse.next();
+    // Set a special session cookie to maintain authentication
+    response.cookies.set("authSession", "true", {
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+    return response;
   }
 
+  // Check for our auth session cookie
+  const hasAuthSession = request.cookies.get("authSession")?.value;
+
   // If not logged in and trying to access protected route
-  if (!isLoggedIn && !isPublicRoute) {
+  if (!isLoggedIn && !isPublicRoute && !hasAuthSession) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
   // If logged in and trying to access auth pages
