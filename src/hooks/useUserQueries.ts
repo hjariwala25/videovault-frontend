@@ -50,8 +50,7 @@ export function useLogin() {
     }) => {
       const response = await api.post("/users/login", credentials);
       return response.data.data;
-    },
-    onSuccess: (data) => {
+    },    onSuccess: (data) => {
       // Set user data immediately
       queryClient.setQueryData(queryKeys.user.current(), data.user);
 
@@ -103,8 +102,7 @@ export function useLogout() {
         "authSession=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
 
       await api.post("/users/logout");
-    },
-    onSuccess: () => {
+    },onSuccess: () => {
       // Reset all queries and clear cache fully
       queryClient.resetQueries();
       queryClient.clear();

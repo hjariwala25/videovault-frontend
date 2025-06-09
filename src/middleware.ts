@@ -13,7 +13,6 @@ export function middleware(request: NextRequest) {
       : pathname;
 
   const isPublicRoute = publicRoutes.includes(normalizedPathname);
-
   // Get authentication tokens
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
@@ -21,9 +20,9 @@ export function middleware(request: NextRequest) {
 
   // Check for auth flags
   const isAuthRedirect = request.nextUrl.searchParams.has("auth");
+  
   // Create a response that we can modify
   const response = NextResponse.next();
-
   // If this is the home route and we have auth param, set an auth cookie and proceed
   if (normalizedPathname === "/" && isAuthRedirect) {
     // Set a special session cookie to maintain authentication
@@ -34,10 +33,8 @@ export function middleware(request: NextRequest) {
     });
     return response;
   }
-
   // Check for our auth session cookie
   const hasAuthSession = request.cookies.get("authSession")?.value;
-
   // If not logged in and trying to access protected route
   if (!isLoggedIn && !isPublicRoute && !hasAuthSession) {
     return NextResponse.redirect(new URL("/login", request.url));
