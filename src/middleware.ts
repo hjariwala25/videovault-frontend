@@ -17,14 +17,18 @@ export function middleware(request: NextRequest) {
   // Get authentication tokens
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
-  const isLoggedIn = !!(accessToken || refreshToken);
+  const isLoggedIn = !!(accessToken || refreshToken); // Check if the auth param is present (indicates coming from login process)
+  const isAuthRedirect = request.nextUrl.searchParams.has("auth");
 
+  // If this is the home route and we have auth param, let it proceed without middleware checks
+  if (normalizedPathname === "/" && isAuthRedirect) {
+    return NextResponse.next();
+  }
 
   // If not logged in and trying to access protected route
   if (!isLoggedIn && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-
   // If logged in and trying to access auth pages
   if (isLoggedIn && isPublicRoute) {
     return NextResponse.redirect(new URL("/", request.url));

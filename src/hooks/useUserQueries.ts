@@ -60,10 +60,12 @@ export function useLogin() {
         queryKey: ["user"],
       });
 
-      // Forceful redirect to home after a small delay to ensure state updates
+      // Give cookies more time to be properly set and recognized by the browser
       setTimeout(() => {
-        window.location.href = "/";
-      }, 100);
+        // Use a much longer timeout to ensure cookies are properly set
+        // Adding query param to bypass any cache and force a full page load
+        window.location.href = "/?auth=" + new Date().getTime();
+      }, 1500);
     },
     onError: (error) => {
       toast.error(`Login failed: ${error}`);
