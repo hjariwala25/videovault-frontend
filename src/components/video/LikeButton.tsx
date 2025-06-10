@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ThumbsUp } from "lucide-react";
 import { formatCount } from "@/utils/formatTime";
-// import the correct mutation type or define it here if missing
-// import { VideoMutation } from "@/types";
+
 type VideoMutation = {
   mutate: (videoId: string) => void;
   isPending: boolean;
@@ -35,18 +34,14 @@ export default function LikeButton({
     >
       {toggleLike.isPending ? (
         <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
-      ) : isLiked ? (
-        <>
-          <ThumbsDown className="mr-1.5 h-4 w-4" />
-          Unlike
-        </>
       ) : (
-        <>
-          <ThumbsUp className="mr-1.5 h-4 w-4" />
-          Like
-        </>
+        <ThumbsUp
+          className={`mr-1.5 h-4 w-4 ${isLiked ? "fill-current" : ""}`}
+        />
       )}
-      <span className="ml-1">{formatCount(likesCount || 0)}</span>
+      <span className="font-medium">
+        {formatCount(likesCount || 0)} {likesCount === 1 ? "Like" : "Likes"}
+      </span>
     </Button>
   );
 }

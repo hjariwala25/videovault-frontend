@@ -98,6 +98,7 @@ function ExploreContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadingChannelId, setLoadingChannelId] = useState<string | null>(null);
 
   // Get URL params
   const sort = searchParams.get("sort") || "subscribers";
@@ -211,6 +212,9 @@ function ExploreContent() {
 
   // Handle subscription toggle
   const handleToggleSubscription = (channelId: string, index: number) => {
+    // Set the loading state for this specific channel
+    setLoadingChannelId(channelId);
+
     // Update UI optimistically
     setChannels((prev) => {
       const updated = [...prev];
@@ -225,6 +229,8 @@ function ExploreContent() {
     toggleSubscription.mutate(channelId, {
       onSuccess: () => {
         toast.success("Subscription updated successfully");
+        // Clear loading state
+        setLoadingChannelId(null);
       },
       onError: () => {
         // Revert UI change on error
@@ -237,6 +243,8 @@ function ExploreContent() {
           return updated;
         });
         toast.error("Failed to update subscription");
+        // Clear loading state
+        setLoadingChannelId(null);
       },
     });
   };
@@ -468,14 +476,14 @@ function ExploreContent() {
                           onClick={() =>
                             handleToggleSubscription(channel._id, index)
                           }
-                          disabled={toggleSubscription.isPending}
+                          disabled={loadingChannelId === channel._id}
                           className={
                             channel.isSubscribed
                               ? "border-gray-200 dark:border-gray-800"
                               : "bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600"
                           }
                         >
-                          {toggleSubscription.isPending ? (
+                          {loadingChannelId === channel._id ? (
                             <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                           ) : channel.isSubscribed ? (
                             <>
@@ -520,7 +528,7 @@ function ExploreContent() {
             {/* Summary */}
             {pagination && (
               <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
-                Showing {channels.length} of {pagination.totalResults} channels
+                Showing {channels.length} channels
               </p>
             )}
           </>
